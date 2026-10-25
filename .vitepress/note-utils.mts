@@ -1,18 +1,18 @@
 /**
  * Shared note metadata helpers.
  *
- * Both the site config (navigation/sidebar) and the homepage content loader use
- * these functions so title extraction and ordering stay consistent.
+ * The site config (navigation/sidebar), the homepage content loader and the
+ * markdown renderer all resolve note metadata through this module, so titles,
+ * dates and ordering stay consistent.
  */
+
+import matter from 'gray-matter'
 
 export interface NoteMeta {
   title: string
   updated: string
 }
 
-const FRONTMATTER_RE = /^---\r?\n([\s\S]*?)\r?\n---/
-const TITLE_RE = /^title:\s*(.+?)\s*$/m
-const UPDATED_RE = /^updated:\s*(.+?)\s*$/m
 const H1_RE = /^#\s+(.+?)\s*$/m
 
 function cleanTitle(value: string): string {
@@ -46,15 +46,58 @@ export function normalizeDate(value: unknown): string {
     : new Date(timestamp).toISOString().slice(0, 10)
 }
 
-export function parseNoteSource(raw: string, fallback: string): NoteMeta {
-  const frontmatter = raw.match(FRONTMATTER_RE)?.[1] ?? ''
-  const title =
-    frontmatter.match(TITLE_RE)?.[1] ?? raw.match(H1_RE)?.[1] ?? fallback
+/**
+ * Resolve title and update date from already parsed frontmatter and content.
+ *
+ * Title priority: frontmatter `title` → first H1 → fallback.
+ */
+export function resolveNoteMeta(
+  frontmatter: Record<string, unknown>,
+  content: string,
+  fallback: string
+): NoteMeta {
+  const titleValue = frontmatter.title
+  const frontmatterTitle =
+    typeof titleValue === 'string' || typeof titleValue === 'number'
+      ? String(titleValue)
+      : titleValue instanceof Date && !Number.isNaN(titleValue.getTime())
+        ? titleValue.toISOString().slice(0, 10)
+        : ''
+  const heading = content.match(H1_RE)?.[1] ?? ''
 
   return {
-    title: cleanTitle(title),
-    updated: normalizeDate(frontmatter.match(UPDATED_RE)?.[1])
+    title:
+      cleanTitle(frontmatterTitle) ||
+      cleanTitle(heading) ||
+      cleanTitle(fallback),
+    updated: normalizeDate(frontmatter.updated)
   }
+}
+
+/**
+ * Parse a note's raw source. Uses the same gray-matter parser as VitePress, so
+ * multiline, quoted and escaped frontmatter values are handled consistently.
+ */
+export function parseNoteSource(raw: string, fallback: string): NoteMeta {
+  const { data, content } = matter(raw)
+  return resolveNoteMeta(data, content, fallback)
+}
+
+/**
+ * Derive a canonical slug from a page URL, independent of `.html` and of
+ * percent-encoding. Used for title fallbacks and tie-breaking.
+ */
+export function slugFromUrl(url: string): string {
+  const segment = url.split('/').filter(Boolean).pop() ?? ''
+  let decoded = segment
+
+  try {
+    decoded = decodeURIComponent(segment)
+  } catch {
+    // Keep the raw segment when it is not valid percent-encoding.
+  }
+
+  return decoded.replace(/\.html$/, '') || '未命名笔记'
 }
 
 /**

@@ -1,7 +1,7 @@
 import { createContentLoader } from 'vitepress'
 import {
-  normalizeDate,
   parseNoteSource,
+  slugFromUrl,
   sortNotes
 } from '../.vitepress/note-utils.mts'
 
@@ -17,22 +17,14 @@ export default createContentLoader('notes/*.md', {
     const notes = data
       .filter((page) => page.url !== '/notes/' && page.url !== '/notes/index')
       .map((page) => {
-        const fallback = decodeURIComponent(
-          page.url.split('/').filter(Boolean).pop() || '未命名笔记'
-        )
-        const meta = parseNoteSource(page.src ?? '', fallback)
-        const frontmatterTitle =
-          typeof page.frontmatter.title === 'string'
-            ? page.frontmatter.title
-            : ''
+        const slug = slugFromUrl(page.url)
+        const { title, updated } = parseNoteSource(page.src ?? '', slug)
 
-        return {
-          title: frontmatterTitle || meta.title,
-          updated: normalizeDate(page.frontmatter.updated) || meta.updated,
-          url: page.url
-        }
+        return { title, updated, url: page.url, slug }
       })
 
-    return sortNotes(notes, (note) => note.url)
+    return sortNotes(notes, (note) => note.slug).map(
+      ({ title, updated, url }) => ({ title, updated, url })
+    )
   }
 })

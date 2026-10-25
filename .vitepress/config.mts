@@ -19,9 +19,9 @@ const notes = fs.existsSync(notesDir)
             slug
           )
 
-          return { text: title, link: `/notes/${slug}`, updated }
+          return { text: title, link: `/notes/${slug}`, updated, slug }
         }),
-      (note) => note.link
+      (note) => note.slug
     ).map(({ text, link }) => ({ text, link }))
   : []
 
