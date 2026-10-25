@@ -3,7 +3,6 @@
 Vendored Material Design 3 CSS implementation used by this VitePress theme.
 
 - Upstream: <https://github.com/hiratazx/material-you-css>
-- Commit: `9fd26c2ccdd82e8933e5b298f11e402a56e21255` (2026-02-23)
 - License: MIT — see [LICENSE](./LICENSE)
 - Vendored file: [material-you.css](./material-you.css)
 
