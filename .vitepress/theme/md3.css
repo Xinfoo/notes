@@ -514,6 +514,13 @@
   line-height: var(--md-sys-typescale-display-small-line-height);
 }
 
+.vp-doc .note-updated {
+  margin: -8px 0 24px;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
 .vp-doc h2 {
   margin: 40px 0 12px;
   padding-top: 0;
@@ -1022,6 +1029,18 @@
   font-weight: var(--md-sys-typescale-title-large-weight);
   letter-spacing: 0;
   line-height: var(--md-sys-typescale-title-large-line-height);
+}
+
+.note-index-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.note-index-date {
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .note-index-action {

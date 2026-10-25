@@ -13,7 +13,12 @@ import { data as notes } from '../../docs/notes.data.mts'
         class="note-index-card"
         :href="note.url"
       >
-        <span class="note-index-card-title">{{ note.title }}</span>
+        <span class="note-index-copy">
+          <span class="note-index-card-title">{{ note.title }}</span>
+          <span v-if="note.updated" class="note-index-date">
+            更新于 {{ note.updated }}
+          </span>
+        </span>
         <span class="note-index-action">
           打开笔记
           <span class="vpi-arrow-right" aria-hidden="true" />
