@@ -157,9 +157,12 @@
 
 /**
  * MD3 appearance switch
+ *
+ * `.VPNavAppearance` wraps the switch in the desktop bar, the mobile screen
+ * and the overflow `⋯` menu, so one set of rules keeps them identical.
  * -------------------------------------------------------------------------- */
 
-.VPNavBar .VPSwitchAppearance {
+.VPNavAppearance .VPSwitch.VPSwitchAppearance {
   width: 52px;
   height: 32px;
   border: 2px solid var(--md-sys-color-outline);
@@ -173,20 +176,20 @@
       var(--md-sys-motion-easing-standard);
 }
 
-.VPNavBar .VPSwitchAppearance:hover {
+.VPNavAppearance .VPSwitch.VPSwitchAppearance:hover {
   border-color: var(--md-sys-color-on-surface);
 }
 
-.VPNavBar .VPSwitchAppearance[aria-checked='true'] {
+.VPNavAppearance .VPSwitch.VPSwitchAppearance[aria-checked='true'] {
   border-color: var(--md-sys-color-primary);
   background-color: var(--md-sys-color-primary);
 }
 
-.VPNavBar .VPSwitchAppearance[aria-checked='true']:hover {
+.VPNavAppearance .VPSwitch.VPSwitchAppearance[aria-checked='true']:hover {
   border-color: var(--md-sys-color-primary);
 }
 
-.VPNavBar .VPSwitchAppearance .check {
+.VPNavAppearance .VPSwitch.VPSwitchAppearance .check {
   top: 50%;
   left: 4px;
   width: 16px;
@@ -205,19 +208,25 @@
       var(--md-sys-motion-easing-standard);
 }
 
-.dark .VPNavBar .VPSwitchAppearance .check {
+.dark .VPNavAppearance .VPSwitch.VPSwitchAppearance .check {
   transform: translateY(-50%);
 }
 
-.VPNavBar .VPSwitchAppearance[aria-checked='true'] .check {
+.VPNavAppearance .VPSwitch.VPSwitchAppearance[aria-checked='true'] .check {
   left: 22px;
   width: 24px;
   height: 24px;
   background-color: var(--md-sys-color-on-primary);
 }
 
-.VPNavBar .VPSwitchAppearance .icon {
+.VPNavAppearance .VPSwitch.VPSwitchAppearance .icon {
   display: none;
+}
+
+.VPNavScreen .VPNavAppearance.VPNavScreenAppearance {
+  gap: 16px;
+  padding: 12px 16px;
+  border-radius: var(--md-sys-shape-corner-medium);
 }
 
 .VPNavBar .VPNavBarAppearance {
