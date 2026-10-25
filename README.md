@@ -40,6 +40,7 @@
 ├── docs/
 │   ├── index.md              # 首页与免责声明
 │   ├── notes/                # 所有笔记
+│   ├── templates/            # 笔记模板，不参与自动索引
 │   ├── notes.data.mts        # 首页自动索引的数据加载器
 │   └── public/               # 原样复制到站点根目录的静态资源
 ├── .vitepress/
@@ -71,7 +72,7 @@ pnpm docs:preview
 
 ## 新增笔记
 
-在 `docs/notes/` 下新建 Markdown 文件，例如：
+在 `docs/notes/` 下新建 Markdown 文件，或者直接复制模板过去再修改：[带注释模板](docs/templates/note-template.md) / [无注释模板](docs/templates/note-template-no-comments.md)。例如：
 
 ```md
 ---
