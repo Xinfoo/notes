@@ -1,7 +1,7 @@
 ---
 title: 为 Arch Linux 配置安全启动
 description: 使用 shim 与 systemd-boot 为 Arch Linux 配置 UEFI 安全启动，包括创建、导入、签名和检查 MOK 证书。
-updated: 2026-10-25
+updated: 2026-06-20
 outline: [2, 3]
 ---
 

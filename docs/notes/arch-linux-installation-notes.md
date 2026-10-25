@@ -1,7 +1,7 @@
 ---
 title: Arch Linux 安装笔记
 description: 从 Live 环境到桌面环境的 Arch Linux 安装过程记录，涵盖磁盘分区、内核、驱动、桌面环境与系统引导。
-updated: 2026-10-25
+updated: 2026-04-30
 outline: [2, 4]
 ---
 
