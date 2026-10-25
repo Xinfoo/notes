@@ -1,0 +1,398 @@
+/**
+ * Material You theme tokens are vendored in material-you.css.
+ * This file bridges them to VitePress and fixes the reading typography.
+ */
+
+/**
+ * Typography
+ * -------------------------------------------------------------------------- */
+
+:root {
+  color-scheme: light;
+
+  --vp-font-family-base:
+    'Noto Sans Variable', 'Noto Sans', 'Noto Sans SC Variable',
+    'Noto Sans SC', 'Noto Sans CJK SC', 'PingFang SC', 'Microsoft YaHei',
+    system-ui, sans-serif;
+  --vp-font-family-mono:
+    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'SFMono-Regular',
+    Menlo, Monaco, Consolas, 'Noto Sans SC Variable', monospace;
+}
+
+/**
+ * Extra semantic colors (MD3 does not define warning/success roles)
+ * -------------------------------------------------------------------------- */
+
+:root {
+  --md-sys-color-warning: #7d5700;
+  --md-sys-color-on-warning: #ffffff;
+  --md-sys-color-warning-container: #ffdea6;
+  --md-sys-color-on-warning-container: #261a00;
+
+  --md-sys-color-success: #386a20;
+  --md-sys-color-on-success: #ffffff;
+  --md-sys-color-success-container: #d7f0c8;
+  --md-sys-color-on-success-container: #0c2000;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --md-sys-color-warning: #f5bd48;
+  --md-sys-color-on-warning: #3f2e00;
+  --md-sys-color-warning-container: #5c4200;
+  --md-sys-color-on-warning-container: #ffdea6;
+
+  --md-sys-color-success: #b1d18f;
+  --md-sys-color-on-success: #1e3a12;
+  --md-sys-color-success-container: #2a5118;
+  --md-sys-color-on-success-container: #cceca9;
+}
+
+/**
+ * Green palette override
+ *
+ * A natural, leafy MD3 scheme (seed around Material Green). Surfaces carry a
+ * subtle green tint instead of the baseline purple, while tertiary stays teal
+ * for a calm, botanical accent.
+ * -------------------------------------------------------------------------- */
+
+:root {
+  --md-sys-color-primary: #386a20;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #b7f397;
+  --md-sys-color-on-primary-container: #042100;
+
+  --md-sys-color-secondary: #55624c;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #d9e7cb;
+  --md-sys-color-on-secondary-container: #131f0d;
+
+  --md-sys-color-tertiary: #386667;
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-tertiary-container: #bbebec;
+  --md-sys-color-on-tertiary-container: #002020;
+
+  --md-sys-color-error: #ba1a1a;
+  --md-sys-color-on-error: #ffffff;
+  --md-sys-color-error-container: #ffdad6;
+  --md-sys-color-on-error-container: #410002;
+
+  --md-sys-color-surface: #f7fbf1;
+  --md-sys-color-surface-dim: #d8dcd3;
+  --md-sys-color-surface-bright: #f7fbf1;
+  --md-sys-color-surface-container-lowest: #ffffff;
+  --md-sys-color-surface-container-low: #f1f5eb;
+  --md-sys-color-surface-container: #ebefe5;
+  --md-sys-color-surface-container-high: #e5e9df;
+  --md-sys-color-surface-container-highest: #dfe4d9;
+  --md-sys-color-on-surface: #181d17;
+  --md-sys-color-on-surface-variant: #43483f;
+  --md-sys-color-outline: #73796e;
+  --md-sys-color-outline-variant: #c3c8bb;
+
+  --md-sys-color-background: #f7fbf1;
+  --md-sys-color-on-background: #181d17;
+  --md-sys-color-inverse-surface: #2d322c;
+  --md-sys-color-inverse-on-surface: #eff2e8;
+  --md-sys-color-inverse-primary: #9cd67e;
+  --md-sys-color-scrim: #000000;
+  --md-sys-color-shadow: #000000;
+}
+
+.dark {
+  --md-sys-color-primary: #9cd67e;
+  --md-sys-color-on-primary: #0a3900;
+  --md-sys-color-primary-container: #205107;
+  --md-sys-color-on-primary-container: #b7f397;
+
+  --md-sys-color-secondary: #bdcbb0;
+  --md-sys-color-on-secondary: #283420;
+  --md-sys-color-secondary-container: #3e4a35;
+  --md-sys-color-on-secondary-container: #d9e7cb;
+
+  --md-sys-color-tertiary: #a0cfd0;
+  --md-sys-color-on-tertiary: #003738;
+  --md-sys-color-tertiary-container: #1e4e4f;
+  --md-sys-color-on-tertiary-container: #bbebec;
+
+  --md-sys-color-error: #ffb4ab;
+  --md-sys-color-on-error: #690005;
+  --md-sys-color-error-container: #93000a;
+  --md-sys-color-on-error-container: #ffdad6;
+
+  --md-sys-color-surface: #10140f;
+  --md-sys-color-surface-dim: #10140f;
+  --md-sys-color-surface-bright: #363a34;
+  --md-sys-color-surface-container-lowest: #0b0f0a;
+  --md-sys-color-surface-container-low: #181d17;
+  --md-sys-color-surface-container: #1c211b;
+  --md-sys-color-surface-container-high: #262b25;
+  --md-sys-color-surface-container-highest: #31362f;
+  --md-sys-color-on-surface: #e0e4db;
+  --md-sys-color-on-surface-variant: #c3c8bb;
+  --md-sys-color-outline: #8d9387;
+  --md-sys-color-outline-variant: #43483f;
+
+  --md-sys-color-background: #10140f;
+  --md-sys-color-on-background: #e0e4db;
+  --md-sys-color-inverse-surface: #e0e4db;
+  --md-sys-color-inverse-on-surface: #2d322c;
+  --md-sys-color-inverse-primary: #386a20;
+  --md-sys-color-scrim: #000000;
+  --md-sys-color-shadow: #000000;
+}
+
+/**
+ * VitePress mapping
+ * -------------------------------------------------------------------------- */
+
+:root {
+  --vp-c-bg: var(--md-sys-color-surface);
+  --vp-c-bg-alt: var(--md-sys-color-surface-container-low);
+  --vp-c-bg-elv: var(--md-sys-color-surface-container);
+  --vp-c-bg-soft: var(--md-sys-color-surface-container);
+
+  --vp-c-border: var(--md-sys-color-outline);
+  --vp-c-divider: var(--md-sys-color-outline-variant);
+  --vp-c-gutter: var(--md-sys-color-outline-variant);
+
+  --vp-c-text-1: var(--md-sys-color-on-surface);
+  --vp-c-text-2: var(--md-sys-color-on-surface-variant);
+  --vp-c-text-3: var(--md-sys-color-outline);
+
+  --vp-c-default-1: var(--md-sys-color-on-surface-variant);
+  --vp-c-default-2: var(--md-sys-color-surface-container-highest);
+  --vp-c-default-3: var(--md-sys-color-surface-container-high);
+  --vp-c-default-soft: var(--md-sys-color-surface-container);
+
+  --vp-c-brand-1: var(--md-sys-color-primary);
+  --vp-c-brand-2: var(--md-sys-color-primary);
+  --vp-c-brand-3: var(--md-sys-color-primary);
+  --vp-c-brand-soft: var(--md-sys-color-primary-container);
+
+  --vp-c-tip-1: var(--md-sys-color-primary);
+  --vp-c-tip-2: var(--md-sys-color-primary);
+  --vp-c-tip-3: var(--md-sys-color-primary);
+  --vp-c-tip-soft: var(--md-sys-color-primary-container);
+
+  --vp-c-note-1: var(--md-sys-color-secondary);
+  --vp-c-note-2: var(--md-sys-color-secondary);
+  --vp-c-note-3: var(--md-sys-color-secondary);
+  --vp-c-note-soft: var(--md-sys-color-secondary-container);
+
+  --vp-c-important-1: var(--md-sys-color-tertiary);
+  --vp-c-important-2: var(--md-sys-color-tertiary);
+  --vp-c-important-3: var(--md-sys-color-tertiary);
+  --vp-c-important-soft: var(--md-sys-color-tertiary-container);
+
+  --vp-c-warning-1: var(--md-sys-color-warning);
+  --vp-c-warning-2: var(--md-sys-color-warning);
+  --vp-c-warning-3: var(--md-sys-color-warning);
+  --vp-c-warning-soft: var(--md-sys-color-warning-container);
+
+  --vp-c-danger-1: var(--md-sys-color-error);
+  --vp-c-danger-2: var(--md-sys-color-error);
+  --vp-c-danger-3: var(--md-sys-color-error);
+  --vp-c-danger-soft: var(--md-sys-color-error-container);
+
+  --vp-c-caution-1: var(--md-sys-color-error);
+  --vp-c-caution-2: var(--md-sys-color-error);
+  --vp-c-caution-3: var(--md-sys-color-error);
+  --vp-c-caution-soft: var(--md-sys-color-error-container);
+
+  --vp-c-success-1: var(--md-sys-color-success);
+  --vp-c-success-2: var(--md-sys-color-success);
+  --vp-c-success-3: var(--md-sys-color-success);
+  --vp-c-success-soft: var(--md-sys-color-success-container);
+
+  /* Layout */
+  --vp-nav-height: 64px;
+  --vp-nav-bg-color: var(--md-sys-color-surface);
+  --vp-nav-screen-bg-color: var(--md-sys-color-surface-container-low);
+  --vp-nav-home-bg-color: var(--md-sys-color-surface);
+  --vp-nav-divider-color: transparent;
+  --vp-nav-backdrop-filter: none;
+  --vp-local-nav-bg-color: var(--md-sys-color-surface-container);
+  --vp-sidebar-width: 320px;
+  --vp-sidebar-bg-color: var(--md-sys-color-surface-container-low);
+  --vp-layout-max-width: 1440px;
+  --vp-backdrop-bg-color: rgba(0, 0, 0, 0.32);
+
+  /* Home */
+  --vp-home-hero-name-color: var(--md-sys-color-primary);
+  --vp-home-hero-name-background: none;
+  --vp-home-hero-image-background-image: none;
+  --vp-home-hero-image-filter: none;
+
+  /* Buttons */
+  --vp-button-brand-border: transparent;
+  --vp-button-brand-text: var(--md-sys-color-on-primary);
+  --vp-button-brand-bg: var(--md-sys-color-primary);
+  --vp-button-brand-hover-border: transparent;
+  --vp-button-brand-hover-text: var(--md-sys-color-on-primary);
+  --vp-button-brand-hover-bg: var(--md-sys-color-primary);
+  --vp-button-brand-active-border: transparent;
+  --vp-button-brand-active-text: var(--md-sys-color-on-primary);
+  --vp-button-brand-active-bg: var(--md-sys-color-primary);
+
+  --vp-button-alt-border: var(--md-sys-color-outline);
+  --vp-button-alt-text: var(--md-sys-color-primary);
+  --vp-button-alt-bg: transparent;
+  --vp-button-alt-hover-border: var(--md-sys-color-outline);
+  --vp-button-alt-hover-text: var(--md-sys-color-primary);
+  --vp-button-alt-hover-bg: transparent;
+  --vp-button-alt-active-border: var(--md-sys-color-outline);
+  --vp-button-alt-active-text: var(--md-sys-color-primary);
+  --vp-button-alt-active-bg: transparent;
+
+  /* Code */
+  --vp-code-color: var(--md-sys-color-on-surface);
+  --vp-code-bg: var(--md-sys-color-surface-container-high);
+  --vp-code-block-color: var(--md-sys-color-on-surface);
+  --vp-code-block-bg: var(--md-sys-color-surface-container-low);
+  --vp-code-line-height: 1.7;
+  --vp-code-font-size: 0.875rem;
+  --vp-code-line-highlight-color: color-mix(
+    in srgb,
+    var(--md-sys-color-primary) 14%,
+    transparent
+  );
+  --vp-code-lang-color: var(--md-sys-color-outline);
+  --vp-code-copy-code-border-color: transparent;
+  --vp-code-copy-code-bg: transparent;
+  --vp-code-copy-code-hover-border-color: transparent;
+  --vp-code-copy-code-hover-bg: var(--md-sys-color-surface-container-highest);
+  --vp-code-copy-code-active-text: var(--md-sys-color-on-surface-variant);
+
+  /* Custom blocks */
+  --vp-custom-block-font-size: 0.875rem;
+  --vp-custom-block-code-font-size: 0.8125rem;
+
+  --vp-custom-block-tip-border: transparent;
+  --vp-custom-block-tip-text: var(--md-sys-color-on-primary-container);
+  --vp-custom-block-tip-bg: var(--md-sys-color-primary-container);
+  --vp-custom-block-tip-code-bg: color-mix(
+    in srgb,
+    var(--md-sys-color-on-primary-container) 10%,
+    transparent
+  );
+
+  --vp-custom-block-info-border: transparent;
+  --vp-custom-block-info-text: var(--md-sys-color-on-secondary-container);
+  --vp-custom-block-info-bg: var(--md-sys-color-secondary-container);
+  --vp-custom-block-info-code-bg: color-mix(
+    in srgb,
+    var(--md-sys-color-on-secondary-container) 10%,
+    transparent
+  );
+
+  --vp-custom-block-note-border: transparent;
+  --vp-custom-block-note-text: var(--md-sys-color-on-secondary-container);
+  --vp-custom-block-note-bg: var(--md-sys-color-secondary-container);
+  --vp-custom-block-note-code-bg: color-mix(
+    in srgb,
+    var(--md-sys-color-on-secondary-container) 10%,
+    transparent
+  );
+
+  --vp-custom-block-warning-border: transparent;
+  --vp-custom-block-warning-text: var(--md-sys-color-on-warning-container);
+  --vp-custom-block-warning-bg: var(--md-sys-color-warning-container);
+  --vp-custom-block-warning-code-bg: color-mix(
+    in srgb,
+    var(--md-sys-color-on-warning-container) 10%,
+    transparent
+  );
+
+  --vp-custom-block-danger-border: transparent;
+  --vp-custom-block-danger-text: var(--md-sys-color-on-error-container);
+  --vp-custom-block-danger-bg: var(--md-sys-color-error-container);
+  --vp-custom-block-danger-code-bg: color-mix(
+    in srgb,
+    var(--md-sys-color-on-error-container) 10%,
+    transparent
+  );
+
+  --vp-custom-block-important-border: transparent;
+  --vp-custom-block-important-text: var(--md-sys-color-on-tertiary-container);
+  --vp-custom-block-important-bg: var(--md-sys-color-tertiary-container);
+  --vp-custom-block-important-code-bg: color-mix(
+    in srgb,
+    var(--md-sys-color-on-tertiary-container) 10%,
+    transparent
+  );
+
+  --vp-custom-block-caution-border: transparent;
+  --vp-custom-block-caution-text: var(--md-sys-color-on-error-container);
+  --vp-custom-block-caution-bg: var(--md-sys-color-error-container);
+  --vp-custom-block-caution-code-bg: color-mix(
+    in srgb,
+    var(--md-sys-color-on-error-container) 10%,
+    transparent
+  );
+
+  --vp-custom-block-details-border: transparent;
+  --vp-custom-block-details-text: var(--md-sys-color-on-surface);
+  --vp-custom-block-details-bg: var(--md-sys-color-surface-container-high);
+  --vp-custom-block-details-code-bg: color-mix(
+    in srgb,
+    var(--md-sys-color-on-surface) 8%,
+    transparent
+  );
+
+  /* Elevation */
+  --vp-shadow-1:
+    0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+  --vp-shadow-2:
+    0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
+  --vp-shadow-3:
+    0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
+  --vp-c-shadow-3: var(--vp-shadow-2);
+}
+
+/**
+ * Base
+ * -------------------------------------------------------------------------- */
+
+html {
+  background-color: var(--md-sys-color-surface);
+}
+
+body {
+  margin: 0;
+  color: var(--md-sys-color-on-surface);
+  background-color: var(--md-sys-color-surface);
+  font-family: var(--vp-font-family-base);
+  font-size: 16px;
+  line-height: 1.75;
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition:
+    background-color var(--md-sys-motion-duration-medium2)
+      var(--md-sys-motion-easing-standard),
+    color var(--md-sys-motion-duration-medium2)
+      var(--md-sys-motion-easing-standard);
+}
+
+::selection {
+  color: var(--md-sys-color-on-primary-container);
+  background-color: var(--md-sys-color-primary-container);
+}
+
+:focus-visible {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
