@@ -70,6 +70,8 @@ pnpm docs:build
 pnpm docs:preview
 ```
 
+站点启用了 `cleanUrls`，页面链接不带 `.html`。构建产物中仍是 `*.html` 文件，部署服务器需要把 `/foo` 映射到 `/foo.html`：Netlify、GitHub Pages 默认支持，Vercel 需在 `vercel.json` 中开启 `cleanUrls`。
+
 ## 新增笔记
 
 在 `docs/notes/` 下新建 Markdown 文件，或者直接复制模板过去再修改：[带注释模板](docs/templates/note-template.md) / [无注释模板](docs/templates/note-template-no-comments.md)。例如：

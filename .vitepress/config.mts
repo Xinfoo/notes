@@ -33,6 +33,7 @@ const noteNav = notes.length
 export default defineConfig({
   lang: 'zh-CN',
   srcDir: 'docs',
+  cleanUrls: true,
 
   title: '笔记',
   description: '一个持续积累的个人文档库。',
