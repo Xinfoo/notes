@@ -224,16 +224,22 @@
 }
 
 .VPNavScreen .VPNavAppearance.VPNavScreenAppearance {
-  gap: 16px;
+  justify-content: flex-start;
+  gap: 8px;
   padding: 12px 16px;
   border-radius: var(--md-sys-shape-corner-medium);
+}
+
+.VPNavScreen .VPNavAppearance.VPNavScreenAppearance .text {
+  margin-right: auto;
 }
 
 .VPNavBar .VPNavBarAppearance {
   gap: 8px;
 }
 
-.VPNavBar .VPNavBarAppearance::after {
+.VPNavBar .VPNavBarAppearance::after,
+.VPNavScreen .VPNavAppearance.VPNavScreenAppearance::after {
   content: '浅色';
   color: var(--md-sys-color-on-surface-variant);
   font-size: var(--md-sys-typescale-label-medium-size);
@@ -244,7 +250,8 @@
   user-select: none;
 }
 
-.dark .VPNavBar .VPNavBarAppearance::after {
+.dark .VPNavBar .VPNavBarAppearance::after,
+.dark .VPNavScreen .VPNavAppearance.VPNavScreenAppearance::after {
   content: '深色';
 }
 
