@@ -1,7 +1,7 @@
 ---
 title: Arch Linux 安装笔记
 description: 从 Live 环境到桌面环境的 Arch Linux 安装过程记录，涵盖磁盘分区、内核、驱动、桌面环境与系统引导。
-updated: 2026-04-30
+updated: 2026-10-31
 outline: [2, 4]
 ---
 
@@ -14,7 +14,7 @@ outline: [2, 4]
 :::
 
 ::: warning 请勿在未理解完全的情况下照抄
-如果你不知道通过什么方式找到了这个页面，请仔细辨别文中内容再参照使用。
+如果您不知道通过什么方式找到了这个页面，请仔细辨别文中内容再参照使用。
 :::
 
 ---
@@ -117,7 +117,7 @@ ping -c 4 archlinux.org
 timedatectl
 ```
 
-请检查输出的三个时间是否同步，同步则继续。（在未修改任何配置的情况下， Live CD 使用的是 UTC 时间，如果您不在欧洲，本地时间和这三个显示的时间不同是正常现象，比如您在中国，您的时间应该是 UTC 时间再加8小时。）
+请检查输出的三个时间是否同步，同步则继续。（在未修改任何配置的情况下， Live CD 使用的是 UTC 时间，如果您不在欧洲，本地时间和这三个显示的时间不同是正常现象，比如您在中国，您的时间应该是 UTC 时间加8小时。）
 
 ---
 
@@ -125,7 +125,7 @@ timedatectl
 
 ### 1、检查磁盘
 
-系统如果识别到计算机的硬盘、U盘或者移动硬盘等，就会将其分配为一个块设备，如 `/dev/sda` 、`/dev/nvme0n1` 。一般情况下，使用 SATA 接口的硬盘显示为 `/dev/sdX` ，使用 NVMe 接口的硬盘显示为 `/dev/nvmeXnY` ，可以使用 lsblk 或者 fdisk 等工具查看，这里使用 fdisk 。  
+系统识别到计算机的硬盘、U盘或者移动硬盘等，就会将其分配为一个块设备，如 `/dev/sda` 、`/dev/nvme0n1` 。一般情况下，使用 SATA 接口的硬盘显示为 `/dev/sdX` ，使用 NVMe 接口的硬盘显示为 `/dev/nvmeXnY` ，可以使用 lsblk 或者 fdisk 等工具查看，这里使用 fdisk 。  
 
 运行：
 
@@ -135,20 +135,20 @@ fdisk -l
 
 结果中以 `rom`、`loop` 或者 `airootfs` 结尾的设备可以被忽略。结果中以 `rpmb`、`boot0` 或者 `boot1` 结尾的 `mmcblk*` 设备也可以被忽略。  
 
-如果您的磁盘有错误的话，命令应该会返回部分红字，没有的话则继续。
+如果您的磁盘有错误的话，命令提示符应该会非零值，没有的话则继续。
 
 如果您在重装 Arch Linux 之前并没有完全删除磁盘分区，要全新安装清除磁盘的话，可以这样操作。
 
 对于 SSD ，运行：
 
 ```zsh
-blkdiscard -f /dev/(要清除的磁盘)
+blkdiscard -f /dev/<要清除的磁盘>
 ```
 
 对于 HDD ，运行：
 
 ```zsh
-sgdisk --zap-all /dev/(要清除的磁盘)
+sgdisk --zap-all /dev/<要清除的磁盘>
 ```
 
 ::: danger 注意
@@ -170,7 +170,7 @@ sgdisk --zap-all /dev/(要清除的磁盘)
 运行：
 
 ```zsh
-cfdisk /dev/(要被分区的磁盘)
+cfdisk /dev/<要被分区的磁盘>
 ```
 
 之后会提示您新建分区表，如果是 BIOS 引导的话请选择 dos ，如果是 UEFI 引导的话请选择 GPT 。
@@ -211,13 +211,13 @@ cfdisk 是一个易用的类图形化的磁盘分区工具，使用上下左右�
 要格式化为 Ext4 文件系统，运行：
 
 ```zsh
-mkfs.ext4 /dev/(根分区)
+mkfs.ext4 /dev/<根分区>
 ```
 
 要格式化为 XFS 文件系统，运行：
 
 ```zsh
-mkfs.xfs /dev/(根分区)
+mkfs.xfs /dev/<根分区>
 ```
 
 ::: tip 使用 F2FS 文件系统
@@ -227,13 +227,13 @@ mkfs.xfs /dev/(根分区)
 如果您是 SSD ，用这条命令将根分区格式化为 F2FS 文件系统：
 
 ```zsh
-mkfs.f2fs -O extra_attr,inode_checksum,sb_checksum,compression /dev/(根分区)
+mkfs.f2fs -O extra_attr,inode_checksum,sb_checksum,compression /dev/<根分区>
 ```
 
 如果您是叠瓦式机械硬盘，用这条命令将根分区格式化为 F2FS 文件系统：
 
 ```zsh
-mkfs.f2fs -m -O extra_attr,inode_checksum,sb_checksum,compression /dev/(根分区)
+mkfs.f2fs -m -O extra_attr,inode_checksum,sb_checksum,compression /dev/<根分区>
 ```
 
 ::: warning 警告
@@ -243,13 +243,13 @@ mkfs.f2fs -m -O extra_attr,inode_checksum,sb_checksum,compression /dev/(根分�
 如果您是 UEFI 引导的话，这时要格式化 EFI 分区为 FAT32 文件系统：
 
 ```zsh
-mkfs.fat -F 32 /dev/(EFI 系统分区)
+mkfs.fat -F 32 /dev/<EFI 系统分区>
 ```
 
 对于 SWAP 分区，格式化为 SWAP 文件系统：
 
 ```zsh
-mkswap /dev/(交换空间分区)
+mkswap /dev/<交换空间分区>
 ```
 
 ---
@@ -259,12 +259,36 @@ mkswap /dev/(交换空间分区)
 您需要将根分区挂载到 `/mnt` ，运行：
 
 ```zsh
-mount /dev/(根分区) /mnt
+mount /dev/<根分区> /mnt
 ```
 
 ::: tip 挂载 F2FS
-F2FS 文件系统并不是一个开箱即用的文件系统，挂载选项通常需要根据使用场景优化，在这里可以保持上面的挂载命令，但是也可以使用我们给出的更适合通用情况挂载选项 mount -o compress_algorithm=zstd:6,compress_chksum,atgc,gc_merge,lazytime /dev/(根分区) /mnt ，这些参数之后可以通过修改 fstab 继续优化。
+F2FS 文件系统并不是一个开箱即用的文件系统，挂载选项通常需要根据使用场景优化。
 :::
+
+普遍的，通用的对于 SSD 使用 F2FS 时的挂载选项：
+
+```zsh
+mount -o compress_algorithm=zstd:6,compress_chksum,atgc,gc_merge,lazytime /dev/<根分区> /mnt
+```
+
+为性能优化的，断电不稳定的对于 SSD 使用 F2FS 时的挂载选项：
+
+```zsh
+mount -o noatime,lazytime,gc_merge,atgc,nodiscard,fsync_mode=nobarrier /dev/<根分区> /mnt
+```
+
+为性能优化的，断电不稳定的对于 SSD 使用 F2FS 时启用压缩的的挂载选项：
+
+```zsh
+mount -o noatime,lazytime,gc_merge,atgc,nodiscard,fsync_mode=nobarrier,compress_algorithm=zstd:6,compress_chksum /dev/<根分区> /mnt
+```
+
+对于使用 F2FS 的 HDD 时，通常，保持默认即可：
+
+```zsh
+mount /dev/<根分区> /mnt
+```
 
 然后使用 mkdir 在 /mnt 下创建任何剩余的挂载点（例如，为 /boot 而创建 /mnt/boot），并按相应的层级顺序挂载相应的磁盘卷。
 
@@ -277,13 +301,13 @@ F2FS 文件系统并不是一个开箱即用的文件系统，挂载选项通常
 对于 UEFI 系统，挂载 EFI 系统分区，运行：
 
 ```zsh
-mount --mkdir /dev/(EFI 系统分区) /mnt/boot
+mount --mkdir /dev/<EFI 系统分区> /mnt/boot
 ```
 
 如果创建了交换空间卷，使用 swapon 启用它：
 
 ```zsh
-swapon /dev/(交换空间分区)
+swapon /dev/<交换空间分区>
 ```
 
 ---
@@ -307,6 +331,12 @@ Server = https://mirrors.tuna.tsinghua.edu.cn/archlinux/$repo/os/$arch
 ```
 
 之后按 esc 键退出插入模式，用键盘输入 : 符号进入 vim 的命令模式，输入 wq 加回车，保存并退出。如果写错了的话，在编辑模式按 x 键删除光标所在的文字，输入 q! 不保存退出。
+
+或者，你也可以使用 curl 从 Arch Linux 官方网站上下载一份符合所在地区的镜像站列表，例如下载适用中国地区的镜像站列表：
+
+```zsh
+curl -L 'https://archlinux.org/mirrorlist/?country=CN&protocol=https' -o /etc/pacman.d/mirrorlist
+```
 
 更新软件包缓存以检查镜像站是否设置成功，运行：
 
@@ -383,7 +413,7 @@ cat /mnt/etc/fstab
 接下来的步骤需要像启动到新安装的系统一样直接与其环境、工具和配置进行交互，请 chroot 到新安装的系统：
 
 ```zsh
-arch-chroot /mnt
+arch-chroot -S /mnt
 ```
 
 ::: info 注意
@@ -398,10 +428,10 @@ arch-chroot /mnt
 
 ### 3、设置时间和时区
 
-为顺应人类习惯（如显示正确的当地时间及处理夏令时），请设置时区：
+为顺应习惯（如显示正确的当地时间及处理夏令时），请设置时区：
 
 ```bash
-ln -sf /usr/share/zoneinfo/地区名/城市名 /etc/localtime
+ln -sf /usr/share/zoneinfo/<地区名>/<城市名> /etc/localtime
 ```
 
 ::: info 提示
@@ -457,14 +487,14 @@ LANG=en_US.UTF-8
 ```
 
 ::: info 注意
-如果在此处设置为中文 locale，比如 LANG=zh_CN.UTF-8 ，这可能会导致 tty 上中文显示为方块（因为 TTY 下没有 CJK 字体）。我们推荐在这里保持 locale 为英文，之后在桌面环境中设置中文即可。
+如果在此处设置为中文 locale，比如 LANG=zh_CN.UTF-8 ，这可能会导致 tty 上中文显示为方块（因为 TTY 下没有 CJK 字体）。我们推荐在这里保持 locale 为英文，之后在桌面环境中设置中文。
 :::
 
 ---
 
 ### 5、网络配置
 
-首先，我们需要安装网络管理工具，对于常用桌面环境的情况，我们推荐使用 NetworkManager 。
+首先，需要安装网络管理工具，对于常用桌面环境的情况，推荐使用 NetworkManager 。
 安装：
 
 ```bash
@@ -494,7 +524,7 @@ wifi.backend=iwd
 
 这时就成功使用 iwd 作为后端了。
 
-安装完网络管理器之后，我们要启用它：
+安装完网络管理器之后，要启用它：
 
 ```bash
 systemctl enable NetworkManager.service
@@ -504,7 +534,7 @@ systemctl enable NetworkManager.service
 如果您使用 WiFi 并按照刚才的设置把 iwd 作为 WiFi 后端的话，这里不需要启动 iwd 的 systemd 单元， iwd 会作为 NetworkManager 的子进程由 NetworkManager 启动。
 :::
 
-现在，我们要设置主机名。为您的系统设置一个固定且易于辨识的名称（在联网环境中尤其有用），请创建 hostname 文件，使用 vim 创建并编辑：
+现在，要设置主机名。为您的系统设置一个固定且易于辨识的名称（在联网环境中尤其有用），请创建 hostname 文件，使用 vim 创建并编辑：
 
 ```bash
 vim /etc/hostname
@@ -540,7 +570,7 @@ vim /etc/hosts
 
 ### 6、安装显卡驱动
 
-对于使用 Intel 显卡和 AMD 以及旧的 ATI 显卡用户来说，以上这些显卡的驱动都包含在 linux-firmware 包中，这时通常是开箱即用的，不需要手动配置，这些显卡的用户跳过这一章节就好，继续下一章。在这里着重讲解一下 NVIDIA 显卡驱动。
+对于使用 Intel 显卡和 AMD 以及旧的 ATI 显卡用户来说，以上这些显卡的驱动都包含在 linux-firmware 包中，这时通常是开箱即用的，不需要手动配置，这类显卡的用户请跳过这一章节，继续下一章。在这里着重说明 NVIDIA 显卡驱动。
 
 首先，如果您不知道您的显卡代号或者型号的话，用以下命令检测：
 
@@ -567,11 +597,11 @@ nvidia-open 包支持的是官方的 linux 内核包， nvidia-open-lts 同理�
 :::
 
 ::: warning 使用旧显卡的用户注意
-对于使用开普勒架构以及之前的任意架构的显卡的用户，我们不推荐使用 NVIDIA 推出的闭源驱动，因为对于这些显卡的驱动早就停更了，这些驱动并不支持 Wayland ，而且也不支持最新版的 X.org ，安装它们并不能获得好的体验，这里我们推荐使用开源内核模块 nouveau ，这个内核模块是内核自带的，而且开箱即用，如果您要使用 nouveau 的话，请直接跳过安装显卡驱动这一章节，继续下一章。
+对于使用开普勒架构以及之前的任意架构的显卡的用户，不推荐使用 NVIDIA 推出的闭源驱动，因为对于这些显卡的驱动早已过时，这些驱动并不支持 Wayland ，而且也不支持最新版的 X.org ，安装它们并不能获得好的体验，推荐使用开源内核模块 nouveau ，这个内核模块通常已经集成在内核中，开箱即用，如果您要使用 nouveau 的话，请直接跳过安装显卡驱动这一章节，继续下一章。
 :::
 
 ::: warning 关于带有(AUR)后缀的包的安装
-由于在 chroot 环境是直接使用 root 用户的，但是 Arch Linux 为了安全考虑， makepkg 是不支持以 root 身份运行的。如果您现在按照教程的顺序到了这一步的话，您现在应该在 chroot 的 root 环境，这时要跳过显卡驱动安装这一节，直接进行下一节的操作，之后在后面所有的流程结束重启后再回看本节进行操作。
+由于在 chroot 环境是直接以 root 账户登录，但是 Arch Linux 为了安全考虑， makepkg 不支持以 root 身份运行。如果您现在按照笔记的顺序到了这一步的话，您现在应该在 chroot 的 root 环境，这时要跳过显卡驱动安装这一节，直接进行下一节的操作，之后在后面所有的流程结束重启后再回看本节进行操作。
 :::
 
 安装任意 NVIDIA 的私有驱动包之前，我们要禁用内核自带的 nouveau 模块，以防止冲突，使用 vim 编辑 `/etc/mkinitcpio.conf` ：
@@ -596,9 +626,9 @@ pacman -S nvidia-open-dkms nvidia-utils nvidia-settings
 
 #### 安装带有 (AUR) 后缀的驱动包
 
-请确保您现在登录的不是 root 用户，而是您自己创建的那个账户，我们以安装 nvidia-580xx-dkms 为例，如需安装其他的 AUR 仓库的驱动包的话，直接用上表给出的包名 -dkms 前的内容替换掉命令中的 nvidia-580xx-utils 中的 nvidia-580xx 即可。
+请确保您现在登录的不是 root 用户，而是您自己创建的非特权账户，以安装 nvidia-580xx-dkms 为例，如需安装其他的 AUR 仓库的驱动包的话，直接用上表给出的包名 -dkms 前的内容替换掉命令中的 nvidia-580xx-utils 中的 nvidia-580xx 即可。
 
-首先，我们要安装 git 以便之后克隆 AUR 包的仓库，安装 git ：
+首先，要安装 git 以便之后克隆 AUR 包的仓库，安装 git ：
 
 ```bash
 pacman -S git
@@ -622,7 +652,7 @@ cd nvidia-580xx-utils
 makepkg -sir
 ```
 
-在运行时按提示操作，完成之后，安装其他工具，运行：
+在运行时按提示操作，完成之后，安装 NVIDIA 设置，运行：
 
 ```bash
 pacman -S nvidia-settings
@@ -631,16 +661,16 @@ pacman -S nvidia-settings
 驱动包安装完成。
 
 ::: info 关于 mkinitcpio
-Arch Linux 官方的安装教程提醒在删除 `/etc/mkinitcpio.conf` 中的 kms 钩子之后，要重新运行 mkinitcpio -P ，但是据笔者观察，安装驱动包的时候实际上会自动运行这条命令，如果您在之后没有修改配置，比如 MODULES 段的早启动模块，那就不需要再次运行这条命令。
+Arch Linux 官方的安装指南提醒在删除 `/etc/mkinitcpio.conf` 中的 kms 钩子之后，要重新运行 mkinitcpio -P ，但是据观察，安装驱动包的时候实际上会自动运行这条命令，如果您在之后没有修改配置，比如 MODULES 段的早启动模块，那就不需要再次运行这条命令。
 :::
 
 ---
 
 ### 7、安装蓝牙驱动
 
-如果您拥有 WiFi 无线网卡设备或者您的主机是笔记本，那一般自带蓝牙设备，这时候需要安装驱动，如果您使用的是纯台式机，没有蓝牙设备，那可以跳过本章节，继续下一章。
+如果您拥有蓝牙设备，这时候需要安装驱动，如果您没有蓝牙设备，那可以跳过本章节，继续下一章。
 
-现在广泛使用的蓝牙协议栈实现是 BlueZ ，我们需要安装它：
+现在广泛使用的蓝牙协议栈实现是 BlueZ ，需要安装它：
 
 ```bash
 pacman -S bluez bluez-utils wireless-regdb
@@ -654,7 +684,7 @@ pacman -S bluez bluez-utils wireless-regdb
 
 - **wireless-regdb** 确保蓝牙频率符合规范。
 
-然后，我们启用蓝牙服务：
+然后，启用蓝牙服务：
 
 ```bash
 systemctl enable bluetooth.service
@@ -666,7 +696,7 @@ systemctl enable bluetooth.service
 
 ### 8、安装桌面环境
 
-在安装桌面环境之前，为了能让其显示中文，我们需要安装几款常用字体，运行：
+在安装桌面环境之前，为了能让其显示中文，需要安装几款常用字体，运行：
 
 ```bash
 pacman -S noto-fonts noto-fonts-cjk noto-fonts-emoji noto-fonts-extra ttf-jetbrains-mono ttf-dejavu ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono
@@ -680,7 +710,7 @@ pacman -S noto-fonts noto-fonts-cjk noto-fonts-emoji noto-fonts-extra ttf-jetbra
 
 - **ttf-nerd-fonts-symbols 、 ttf-nerd-fonts-symbols-mono** 用于显示某些终端程序上的图标，比如装了主题的 Zsh 或者 Neovim 。
 
-桌面环境有非常多种，通常，我们的主机安装一个桌面环境即可，我们这里给出 KDE Plasma 和 GNOME 这两种桌面环境的安装。
+桌面环境有非常多种，通常，主机安装一个桌面环境即可，这里给出 KDE Plasma 和 GNOME 这两种桌面环境的安装。
 
 #### 安装 KDE Plasma
 
@@ -691,13 +721,13 @@ KDE 是一套由桌面环境(KDE Plasma)、应用程序（KDE Applications）以
 pacman -S plasma
 ```
 
-通常这还不够，我们还需要安装 KDE 的配套应用，要全部安装他们，运行：
+通常这还不够，还需要安装 KDE 的配套应用，要全部安装他们，运行：
 
 ```bash
 pacman -S kde-applications
 ```
 
-通常，我们并不需要安装完整的 KDE 应用包，这个软件包组数量非常庞大，有很多根本用不上的软件。这里给出我们推荐的安装的 KDE 桌面配套软件，运行：
+通常，并不需要安装完整的 KDE 应用包，这个软件包组数量非常庞大，有很多根本没有使用需求的软件。这里给出推荐的安装的 KDE 桌面配套软件，运行：
 
 ```bash
 pacman -S --needed konsole yakuake dolphin ark kate okular partitionmanager filelight gwenview k3b  kcalc kompare ksystemlog
@@ -730,9 +760,9 @@ pacman -S --needed konsole yakuake dolphin ark kate okular partitionmanager file
 
 - **ksystemlog** 系统日志查看器。
 
-通过安装这些包，你通常能获得一个最小化的开箱即用的 KDE Plasma 桌面环境。
+通过安装这些包，通常能获得一个最小化的开箱即用的 KDE Plasma 桌面环境。
 
-*安装中文输入法* 对于 KDE 来说，推荐的输入法是 Fcitx5 ，我们现在安装它，运行：
+*安装中文输入法* 对于 KDE 来说，推荐的输入法是 Fcitx5 ，要安装它，运行：
 
 ```bash
 pacman -S fcitx5-im fcitx5-chinese-addons
@@ -750,7 +780,12 @@ vim /etc/environment
 XMODIFIERS=@im=fcitx
 ```
 
-保存并退出，稍后在设置中的虚拟键盘选项，选中 Fcitx 即可启用它，输入法安装完成。
+输入法安装完成。
+
+::: info 在 KDE 设置中启用输入法
+之后在启动 KDE Plasma 桌面后要在 KDE 设置中的虚拟键盘选项，选中 Fcitx。
+:::
+
 
 最后，启用登录管理器：
 
@@ -762,7 +797,7 @@ KDE Plasma 桌面环境安装完成。
 
 #### 安装 GNOME 桌面环境
 
-GNOME 是一个追求简单易用的桌面环境。它由 GNOME项目设计，并且完全由自由开源的软件组成。Ubuntu 等发行版使用的就是 GNOME 桌面环境，安装它可以实现从 Ubuntu 无缝迁移。
+GNOME 是一个追求简单易用的桌面环境。它由 GNOME项目设计，并且完全由自由开源的软件组成。Ubuntu 等发行版使用的就是 GNOME 桌面环境，安装它可以几乎实现从 Ubuntu 无缝迁移。
 
 要安装它，有三个包组可以选择：
 
@@ -778,7 +813,7 @@ GNOME 是一个追求简单易用的桌面环境。它由 GNOME项目设计，�
 pacman -S gnome
 ```
 
-由于 GNOME 移除了托盘显示功能，要使其他应用显示托盘，需要通过插件来实现，我们现在要安装它，运行：
+由于 GNOME 移除了托盘显示功能，要让其他应用显示托盘，需要通过插件来实现，要安装它，运行：
 
 ```bash
 pacman -S gnome-shell-extension-appindicator
@@ -844,7 +879,7 @@ systemctl enable systemd-timesyncd.service
 
 ### 10、配置防火墙
 
-使用 firewalld 作为防火墙工具，首先要安装它，运行：
+使用 firewalld 作为防火墙工具，要安装它，运行：
 
 ```bash
 pacman -S firewalld
@@ -888,15 +923,15 @@ passwd root
 
 之后将提示输入您要设置的密码。
 
-我们需要为主机创建非特权账户，日常使用 root 账户登录是十分危险的操作，应当创建非特权账户进行日常操作，仅在管理系统时使用 root 。要创建非特权账户，运行：
+需要为主机创建非特权账户，日常使用 root 账户登录是十分危险的操作，应当创建非特权账户进行日常操作，仅在管理系统时使用 root 。要创建非特权账户，运行：
 
 ```bash
-useradd -m -G wheel -s /bin/bash "(用户名)"
+useradd -m -G wheel -s /bin/bash "<用户名>"
 ```
 
 对于命令的解释：
 
-- **-m** 选项是在此时为该用户创建在 `/home` 目录下的家目录，目录为 `/home/(用户名)` 。
+- **-m** 选项是在此时为该用户创建在 `/home` 目录下的家目录，目录为 `/home/<用户名>` 。
 
 - **-G** 选项是为该用户指定附加组，这里附加的是 `wheel` ，在 Arch Linux 中，这个组拥有 sudo 权限。
 
@@ -905,7 +940,7 @@ useradd -m -G wheel -s /bin/bash "(用户名)"
 为新用户设置密码：
 
 ```bash
-passwd (用户名)
+passwd <用户名>
 ```
 
 之后要使用 sudo ，这时要为 wheel 组启用 sudo 权限，运行：
@@ -914,7 +949,7 @@ passwd (用户名)
 visudo
 ```
 
-打开了一个和 vim 编辑器相同的界面，这里的操作方式和 vim 相同。我们要移动光标，找到以下内容并删除前面的注释：
+会启动一个和 vim 编辑器相同的界面，这里的操作方式和 vim 相同。我们要移动光标，找到以下内容并删除前面的注释：
 
 ```text
 %wheel      ALL=(ALL:ALL) ALL
@@ -928,10 +963,10 @@ visudo
 
 ### 13、安装系统引导
 
-对于系统引导，有多个引导工具可供选择，这里我们使用 GRUB ，这是目前功能最强大，支持最丰富，也是最稳定的引导管理器。
+对于系统引导，有多个引导工具可供选择，这里使用 GRUB ，这是目前功能最强大，支持最丰富，也是最稳定的引导管理器。
 
 ::: info 安全启动
-我们这里不涉及配置 UEFI 下的安全启动，如需配置安全启动，请移步 Arch Wiki 上的 [GRUB](https://wiki.archlinuxcn.org/wiki/GRUB) 页面。
+这里不涉及配置 UEFI 下的安全启动，如需配置安全启动，请移步 Arch Wiki 上的 [GRUB](https://wiki.archlinuxcn.org/wiki/GRUB) 页面。
 :::
 
 要使用 GRUB 引导，首先要安装它，运行：
@@ -957,10 +992,10 @@ grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id='Arch Lin
 ```
 
 ::: info 关于 --removable 选项
-正常情况下，使用上面的那条命令一般能正常安装引导并启动，但是某些主板(尤其是 MSI 微星的主板)会检测 EFI 分区下的 BOOT 文件夹内的文件，如果 BOOTX64.EFI 不存在，则不会为硬盘创建启动条目，这时需要在上面那条命令的基础上加上 --removable 参数运行，如果你使用了 --removable 选项，那 GRUB 将被安装到 `esp/EFI/BOOT/BOOTX64.EFI` 这时可以正常启动。
+正常情况下，使用上面的命令一般能正常安装引导并启动，但是在某些主板固件上(尤其是 MSI 微星主板)会检测 EFI 分区下的 BOOT 文件夹内的文件，如果 BOOTX64.EFI 不存在，则不会为硬盘创建启动条目，这时需要在上面的命令的基础上加 --removable 参数运行，如果您使用了 --removable 选项，那 GRUB 将被安装到 `esp/EFI/BOOT/BOOTX64.EFI` 这时可以正常启动。
 :::
 
-我们推荐再用 --removable 选项安装一次引导，以作为备用，运行：
+推荐再用 --removable 选项安装一次引导，以作为回退启动，运行：
 
 ```bash
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id='Arch Linux' --removable
@@ -971,11 +1006,11 @@ grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id='Arch Lin
 为使用 **BIOS** 引导的系统安装引导，运行：
 
 ```bash
-grub-install --target=i386-pc /dev/(要安装引导的磁盘)
+grub-install --target=i386-pc /dev/<要安装引导的磁盘>
 ```
 
 ::: info 注意
-这里的 i386-pc 是有意为之，与你机器的实际架构无关，保持这样即可， 其中 /dev/(要安装的磁盘) 是要安装 GRUB 的磁盘(不是分区)，比如磁盘 `/dev/sda` 、 `/dev/nvme0n1` 或者 `/dev/mmcblk0` ，而不是分区 `/dev/sda1` 。
+这里的 i386-pc 是有意为之，与您机器的实际架构无关，保持这样即可， 其中 /dev/<要安装的磁盘> 是要安装 GRUB 的磁盘(不是分区)，比如磁盘 `/dev/sda` 、 `/dev/nvme0n1` 或者 `/dev/mmcblk0` ，而不是分区 `/dev/sda1` 。
 :::
 
 对于 BIOS 系统的 GRUB 引导安装成功。
@@ -1028,17 +1063,15 @@ reboot
 
 ## Arch Linux 安装完毕
 
-如果从头到尾未遇到不可解决的问题的话，我们在这里恭喜您，您的 Arch Linux 已经安装完成，让我们一起欢呼！！🌺🌺
-
 关于之后要做的事情，我们给出 Arch Wiki上的建议。
 
-[了解 Arch Linux ！](https://wiki.archlinuxcn.org/wiki/Arch_Linux)
+[了解 Arch Linux](https://wiki.archlinuxcn.org/wiki/Arch_Linux)
 
 [关于 Arch Linux 和其他发行版的区别](https://wiki.archlinuxcn.org/wiki/Arch_与其他发行版的比较)
 
-[如何不弄坏你的 Arch Linux ？](https://wiki.archlinuxcn.org/wiki/建议阅读/给新用户的关于如何不去弄坏_Arch_Linux_系统的建议)
+[如何不弄坏你的 Arch Linux](https://wiki.archlinuxcn.org/wiki/建议阅读/给新用户的关于如何不去弄坏_Arch_Linux_系统的建议)
 
-[建议阅读！管理您的 Arch Linux ！](https://wiki.archlinuxcn.org/wiki/建议阅读)
+[建议阅读](https://wiki.archlinuxcn.org/wiki/建议阅读)
 
 ---
 
