@@ -160,6 +160,10 @@
  *
  * `.VPNavAppearance` wraps the switch in the desktop bar, the mobile screen
  * and the overflow `⋯` menu, so one set of rules keeps them identical.
+ *
+ * VueUse temporarily injects `* { transition: none !important }` while
+ * switching themes; the switch transitions use `!important` so the knob still
+ * animates during that toggle.
  * -------------------------------------------------------------------------- */
 
 .VPNavAppearance .VPSwitch.VPSwitchAppearance {
@@ -173,7 +177,7 @@
     background-color var(--md-sys-motion-duration-short4)
       var(--md-sys-motion-easing-standard),
     border-color var(--md-sys-motion-duration-short4)
-      var(--md-sys-motion-easing-standard);
+      var(--md-sys-motion-easing-standard) !important;
 }
 
 .VPNavAppearance .VPSwitch.VPSwitchAppearance:hover {
@@ -205,7 +209,7 @@
     height var(--md-sys-motion-duration-short4)
       var(--md-sys-motion-easing-standard),
     background-color var(--md-sys-motion-duration-short4)
-      var(--md-sys-motion-easing-standard);
+      var(--md-sys-motion-easing-standard) !important;
 }
 
 .dark .VPNavAppearance .VPSwitch.VPSwitchAppearance .check {
@@ -221,6 +225,13 @@
 
 .VPNavAppearance .VPSwitch.VPSwitchAppearance .icon {
   display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .VPNavAppearance .VPSwitch.VPSwitchAppearance,
+  .VPNavAppearance .VPSwitch.VPSwitchAppearance .check {
+    transition-duration: 0.01ms !important;
+  }
 }
 
 .VPNavScreen .VPNavAppearance.VPNavScreenAppearance {
