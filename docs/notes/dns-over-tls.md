@@ -1,0 +1,365 @@
+---
+title: 为 Arch Linux 配置 DNS over TLS
+description: 使用 systemd-resolved 与 NetworkManager 配置 DoT 加密 DNS，替换系统解析器并验证加密状态。
+updated: 2026-11-07
+outline: [2, 3]
+---
+
+# 为 Arch Linux 配置 DNS over TLS
+
+默认情况下，系统通过 53/UDP 或 53/TCP 查询 DNS，查询内容在本地网络和运营商链路上是明文。DNS over TLS（DoT）把 DNS 查询放进 TLS 连接，使用 853/TCP，可以避免查询内容被直接窥探。
+
+本文使用 systemd-resolved 作为本地 DNS stub，由 NetworkManager 按连接下发 DNS 服务器和 DoT 策略。
+
+::: warning 操作前
+- 修改 DNS 可能导致短暂断网。通过 SSH 操作时，请先准备好本地控制台或回滚方式。
+- 本文假设网络连接由 NetworkManager 管理；如果使用 systemd-networkd、netctl 或其他工具，nmcli 部分不适用。
+- `connection.dns-over-tls 2` 是严格模式：DoT 不可用时不会回退到明文 DNS，可用性会下降。
+- 浏览器可能自己启用 DoH，绕过系统解析器；系统级 DoT 不能强制浏览器走 DoT。
+:::
+
+## 原理
+
+配置完成后，DNS 查询链路大致是：
+
+```text
+应用程序
+  ↓ 127.0.0.53:53
+systemd-resolved（本地 stub）
+  ↓ TLS 853/TCP
+配置的 DoT 服务器（阿里 DNS / Google DNS 等）
+```
+
+几个关键点：
+
+- `/etc/resolv.conf` 指向 `systemd-resolved` 的 `stub-resolv.conf`，应用实际查询的是 `127.0.0.53`。
+- NetworkManager 使用 `dns=systemd-resolved` 后端，把每个连接的 DNS 设置交给 systemd-resolved。
+- `ipv4.dns` 里的 `IP#域名` 写法中，`#` 后面是 TLS 证书校验使用的 SNI 名称，例如 `223.5.5.5#dns.alidns.com`。
+- `connection.dns-over-tls 2` 表示强制 DoT；`1` 是 opportunistic（失败时允许回退明文），`0` 是关闭。严格模式下，列表里的每个 DNS 服务器都必须支持 DoT，否则解析会失败。
+
+## 准备
+
+需要先启用 `systemd-resolved` 并检查 `NetworkManager` 、 `/etc/resolv.conf` 的状态。
+
+### 启用 systemd-resolved
+
+一般情况下，在 Arch Linux 上 systemd-resolved 已经随 systemd 安装，但是并未启用，检查 systemd-resolved 的状态：
+
+```bash
+systemctl status systemd-resolved.service
+```
+
+如果 systemd-resolved 的 unit 为 disabled 且处于 inactive 状态，比如下面这样：
+
+```text
+○ systemd-resolved.service - Network Name Resolution
+     Loaded: loaded (/usr/lib/systemd/system/systemd-resolved.service; disabled; preset: disabled)
+     Active: inactive (dead)
+TriggeredBy: ○ systemd-resolved-monitor.socket
+             ○ systemd-resolved-varlink.socket
+       Docs: man:systemd-resolved.service(8)
+             man:org.freedesktop.resolve1(5)
+             https://systemd.io/WRITING_NETWORK_CONFIGURATION_MANAGERS
+             https://systemd.io/WRITING_RESOLVER_CLIENTS
+```
+
+需要启用它：
+
+```bash
+sudo systemctl enable --now systemd-resolved.service
+```
+
+检查是否启用成功：
+
+```bash
+systemctl status systemd-resolved.service
+```
+
+确保 system-resolved 的 unit 为 enabled 且处于 active 状态，比如下方的样子：
+
+```text
+● systemd-resolved.service - Network Name Resolution
+     Loaded: loaded (/usr/lib/systemd/system/systemd-resolved.service; enabled; preset: enabled)
+     Active: active (running) since Sat XXXX-XX-XX XX:XX:XX XXX; XX ago
+ Invocation: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+TriggeredBy: ● systemd-resolved-monitor.socket
+             ● systemd-resolved-varlink.socket
+       Docs: man:systemd-resolved.service(8)
+             man:org.freedesktop.resolve1(5)
+             https://systemd.io/WRITING_NETWORK_CONFIGURATION_MANAGERS
+             https://systemd.io/WRITING_RESOLVER_CLIENTS
+   Main PID: XXX (systemd-resolve)
+     Status: "Processing requests..."
+      Tasks: XXX (limit: XXX)
+     Memory: XXXM (peak: XXXM)
+        CPU: XXXs
+     CGroup: /system.slice/systemd-resolved.service
+             └─XXX /usr/lib/systemd/systemd-resolved
+```
+
+### 检查 NetworkManager 的状态
+
+确保 NetworkManager 已启用：
+
+```bash
+systemctl status NetworkManager.service
+```
+
+确保 NetworkManager 的 unit 为 enabled 且处于 active 状态，比如下方的样子：
+
+```text
+● NetworkManager.service - Network Manager
+     Loaded: loaded (/usr/lib/systemd/system/NetworkManager.service; enabled; preset: disabled)
+     Active: active (running) since Sat XXXX-XX-XX XX:XX:XX XXX; XXX ago
+ Invocation: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+       Docs: man:NetworkManager(8)
+   Main PID: XXX (NetworkManager)
+      Tasks: XXX (limit: XXX)
+     Memory: XXXM (peak: XXXM)
+        CPU: XXXs
+     CGroup: /system.slice/NetworkManager.service
+             └─XXX /usr/bin/NetworkManager --no-daemon
+```
+
+列出设备中已经存在的设备和连接：
+
+```bash
+nmcli connection show --active
+```
+
+本文后续用 `"有线连接 1"` 作为连接名示例。实际名称以 `nmcli connection show --active` 的输出为准；名称包含空格时必须加引号。
+
+### 检查 `/etc/resolv.conf` 状态
+
+一般情况下，在之前只使用 NetworkManager 管理网络连接时， `/etc/resolv.conf` 由 NetworkManager 管理，检查 `/etc/resolv.conf` 的情况：
+
+```bash
+ls -l /etc/resolv.conf
+cat /etc/resolv.conf
+```
+
+- 如果 `/etc/resolv.conf` 显示为软链接，你的系统中可能已经配置了 dns 管理器，但是不一定是 systemd-resolved ，继续按照本文的操作存在风险，请检查当前系统状态。
+- 确保 `/etc/resolv.conf` 里包含 `Generate By NetworkManager` 相关的注释，否则当前的 `/etc/resolv.conf` 可能不是由 NetworkManager 管理的，改动 `/etc/resolv.conf` 会有风险。
+
+## 让 NetworkManager 使用 systemd-resolved
+
+创建 NetworkManager 配置，使用文本编辑器编辑 `/etc/NetworkManager/conf.d/dns.conf` ，加入以下内容：
+
+```text
+[main]
+dns=systemd-resolved
+```
+
+确认配置已经生效：
+
+```bash
+NetworkManager --print-config | grep -A2 '^\[main\]'
+```
+
+输出里应该能看到：
+
+```text
+[main]
+dns=systemd-resolved
+```
+
+如果 `conf.d` 里其他文件也设置了 `dns=`，以最后加载的配置为准；可以先检查：
+
+```bash
+grep -R "^dns=" /etc/NetworkManager/conf.d/
+```
+
+然后重启 NetworkManager：
+
+```bash
+sudo systemctl restart NetworkManager.service
+```
+
+::: tip
+重启 NetworkManager 可能让当前连接短暂中断。远程操作时请确认能够重新连上，或者改用本地控制台。
+:::
+
+## 让 systemd-resolved 接管 resolv.conf
+
+
+可以选择备份当前的 `/etc/resolv.conf`：
+
+```bash
+sudo cp -L /etc/resolv.conf /etc/resolv.conf.bak
+```
+
+移除旧的 `/etc/resolv.conf` ：
+
+```bash
+sudo rm /etc/resolv.conf
+```
+
+把 `/etc/resolv.conf` 指向 systemd-resolved 的 stub 文件：
+
+```bash
+sudo ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+ls -l /etc/resolv.conf
+```
+
+正常结果应该类似：
+
+```text
+/etc/resolv.conf -> ../run/systemd/resolve/stub-resolv.conf
+```
+
+查看内容时应该只有本地 stub：
+
+```bash
+cat /etc/resolv.conf
+```
+
+其中应包含：
+
+```text
+nameserver 127.0.0.53
+```
+
+`stub-resolv.conf` 由 systemd-resolved 动态维护，不要直接编辑它；要改 DNS 服务器，应该修改 NetworkManager 连接或 systemd-resolved 的配置。
+
+## 为连接配置 DoT
+
+先确认连接名，再修改该连接的 DNS 设置：
+
+```bash
+sudo nmcli connection modify "有线连接 1" ipv4.dns "223.5.5.5#dns.alidns.com, 223.6.6.6#dns.alidns.com, 8.8.8.8#dns.google, 8.8.4.4#dns.google"
+sudo nmcli connection modify "有线连接 1" ipv4.ignore-auto-dns yes
+sudo nmcli connection modify "有线连接 1" connection.dns-over-tls 2
+```
+
+三条命令分别表示：
+
+- `ipv4.dns`：设置 DNS 服务器，并在 `#` 后指定证书校验名称。
+- `ipv4.ignore-auto-dns yes`：忽略 DHCP 下发的 DNS，避免运营商 DNS 混进来。
+- `connection.dns-over-tls 2`：对该连接启用严格 DoT。
+
+应用配置：
+
+```bash
+sudo nmcli connection up "有线连接 1"
+```
+
+如果连接名有空格，务必保留引号；直接把示例名替换成自己的连接名。
+
+### IPv6 也要设置
+
+如果连接启用了 IPv6，只设置 `ipv4.dns` 还不够。RA 或 DHCPv6 仍可能下发 IPv6 DNS，导致部分查询绕过 DoT。建议同时设置：
+
+```bash
+sudo nmcli connection modify "有线连接 1" ipv6.ignore-auto-dns yes
+```
+
+如果确实需要 IPv6 DNS，再按 NetworkManager 的 `ipv6.dns` 格式补充支持 DoT 的 IPv6 服务器。IPv6 地址的写法请以 `nm-settings-nmcli(5)` 为准；不确定时可以先只保留 IPv4 的 DoT 配置。
+
+## 验证
+
+查看 systemd-resolved 的当前状态：
+
+```bash
+resolvectl status
+```
+
+重点看对应连接的部分，例如：
+
+```text
+Link 2 (enp1s0)
+    Current Scopes: DNS
+         Protocols: +DefaultRoute +DNSOverTLS DNSSEC=no/unsupported
+Current DNS Server: 223.5.5.5#dns.alidns.com
+       DNS Servers: 223.5.5.5#dns.alidns.com
+                    223.6.6.6#dns.alidns.com
+                    8.8.8.8#dns.google
+                    8.8.4.4#dns.google
+     Default Route: yes
+```
+
+需要确认：
+
+- `Protocols` 里出现 `+DNSOverTLS`
+- `DNS Servers` 里带上了 `#dns.alidns.com`、`#dns.google` 这类名称
+- `Current DNS Server` 指向你配置的 DoT 服务器
+
+清空缓存并实际查询一次：
+
+```bash
+sudo resolvectl flush-caches
+resolvectl query example.com
+```
+
+如果解析成功，再用 OpenSSL 验证 DNS 服务器的 853 端口和证书：
+
+```bash
+openssl s_client -connect 223.5.5.5:853 -servername dns.alidns.com </dev/null
+```
+
+能完成 TLS 握手并看到证书链，说明到该服务器的 DoT 链路正常；如果连接超时或被重置，检查出站 853/TCP 是否被防火墙或上游网络拦截。
+
+## 注意事项
+
+### DoT 不等于 DNSSEC
+
+DoT 只加密客户端到递归解析器之间的查询，不验证解析结果是否被篡改。需要完整性校验时，还要单独配置 DNSSEC。
+
+### 严格模式没有回退
+
+`connection.dns-over-tls 2` 下，只要配置的 DoT 服务器不可达，DNS 就会失败，不会退回明文。更看重可用性而不是严格加密时，可以改成 `1`（opportunistic），但它存在降级到明文的可能。
+
+### 浏览器和部分应用可能绕过系统解析器
+
+系统级 DoT 只覆盖使用 `getaddrinfo()` / nss-resolve 的应用。浏览器自带的 DoH、某些应用的私有解析器，可能直接连接自己的 DNS 服务，不受这里的配置影响。
+
+### VPN 和公共 Wi-Fi
+
+VPN 建立后可能会下发新的 DNS 配置；公共 Wi-Fi 的强制门户也可能因为严格 DoT 而无法弹出。遇到这些情况，先临时切回 `1` 或 `0`，确认网络可用后再调整。
+
+## 常见问题
+
+### `resolvectl status` 里没有 `+DNSOverTLS`
+
+先确认连接设置确实写入了：
+
+```bash
+nmcli connection show "有线连接 1" | grep -E "dns|DNS"
+```
+
+然后重新应用连接：
+
+```bash
+sudo nmcli connection up "有线连接 1"
+```
+
+如果仍然没有，检查 NetworkManager 版本是否支持 `connection.dns-over-tls`，以及 `dns=systemd-resolved` 是否真的生效。
+
+### DNS 完全不可用
+
+按顺序检查：
+
+- DoT 服务器是否支持 853/TCP，SNI 是否与证书匹配
+- 出站 853 是否被防火墙拦截
+- `ipv4.dns` 里是否混入了不支持 DoT 的服务器
+- `/etc/resolv.conf` 是否指向 `stub-resolv.conf`
+- `systemd-resolved` 是否处于 active 状态
+
+用前面那条 `openssl s_client` 命令可以快速区分“网络到 853 不通”和“DNS 配置有问题”。
+
+### `/etc/resolv.conf` 又被改回去了
+
+某些网络管理工具、VPN 或容器运行时可能重写 `/etc/resolv.conf`。检查它是否仍然是 symlink：
+
+```bash
+ls -l /etc/resolv.conf
+```
+
+如果不是，重新执行前面的 `ln -sf`，并确认没有其他服务在管理这个文件。
+
+## 参考资料
+
+- [Arch Wiki: systemd-resolved](https://wiki.archlinux.org/title/Systemd-resolved)
+- [Arch Wiki: NetworkManager](https://wiki.archlinux.org/title/NetworkManager)
+- [systemd-resolved.service(8)](https://www.freedesktop.org/software/systemd/man/latest/systemd-resolved.service.html)
+- [resolved.conf(5)](https://www.freedesktop.org/software/systemd/man/latest/resolved.conf.html)
+- [nm-settings-nmcli(5)](https://networkmanager.dev/docs/api/latest/nm-settings-nmcli.html)

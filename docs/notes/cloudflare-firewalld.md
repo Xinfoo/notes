@@ -1,7 +1,7 @@
 ---
 title: 针对 Cloudflare CDN 的 firewalld 配置方法
 description: 使用 firewalld 的 ipset 与 rich rule，只允许 Cloudflare 节点访问源站 443/TCP，丢弃其他来源；不包含 IP 池自动更新。
-updated: 2026-11-07
+updated: 2026-11-06
 outline: [2, 3]
 ---
 
@@ -48,12 +48,12 @@ sudo systemctl status firewalld.service
      Active: active (running) since Sat XXXX-XX-XX XX:XX:XX XXX; XXmin ago
  Invocation: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
        Docs: man:firewalld(1)
-   Main PID: 775 (firewalld)
-      Tasks: 2 (limit: 18853)
+   Main PID: XXX (firewalld)
+      Tasks: XXX (limit: XXX)
      Memory: XXM (peak: XXM)
         CPU: XXms
      CGroup: /system.slice/firewalld.service
-             └─775 /usr/bin/python /usr/bin/firewalld --nofork --nopid
+             └─XXX /usr/bin/python /usr/bin/firewalld --nofork --nopid
 ```
 
 示例里的 `preset: disabled` 只是发行版的预设值，不代表 unit 没有 enabled；关键看 `Loaded` 行的 `enabled` 和 `Active` 行的 `active (running)`。
