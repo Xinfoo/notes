@@ -3,7 +3,7 @@ layout: home
 
 hero:
   name: 笔记
-  text: 记录与查阅
+  text: 我阐述你的梦
 ---
 
 <NoteIndex />
