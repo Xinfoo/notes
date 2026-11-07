@@ -40,7 +40,7 @@ firewalld 的 priority 范围是 `-32768` 到 `32767`，**数值越小越先执�
 sudo systemctl status firewalld.service
 ```
 
-确保显示 firewalld 状态为 enabled 并且是 active ，比如下方的样子：
+确保 firewalld 的 unit 为 enabled 且处于 active 状态，比如下方的样子：
 
 ```text
 ● firewalld.service - firewalld - dynamic firewall daemon
@@ -56,7 +56,9 @@ sudo systemctl status firewalld.service
              └─775 /usr/bin/python /usr/bin/firewalld --nofork --nopid
 ```
 
-如果显示为 disable 状态，请启用它：
+示例里的 `preset: disabled` 只是发行版的预设值，不代表 unit 没有 enabled；关键看 `Loaded` 行的 `enabled` 和 `Active` 行的 `active (running)`。
+
+如果显示为 disabled 状态，请启用它：
 
 ```bash
 sudo systemctl enable --now firewalld
@@ -151,7 +153,10 @@ sudo firewall-cmd --permanent --zone=public --add-rich-rule='rule family="ipv6" 
 
 - 命令的添加顺序不影响最终匹配顺序，真正决定顺序的是 `priority`。
 - `drop` 是静默丢弃，客户端通常看到连接超时；如果想立即拒绝，可以改成 `reject`，但 `drop` 更不容易暴露防火墙的存在。
-- 如果 zone 里原本已经允许 `https` 服务，这两条负优先级的 rich rule 会先于普通规则执行，仍然能实现“只允许 Cloudflare”的效果，但是仍然推荐移除已经放行的 443 端口，这时运行 `sudo firewall-cmd --permanent --zone=public --remove-service=https` 或 `sudo firewall-cmd --permanent --zone=public --remove-port=443/tcp` 。
+- 如果 zone 里原本已经允许 `https` 服务，这两条负优先级的 rich rule 会先于普通规则执行，仍然能实现“只允许 Cloudflare”的效果。
+- 不过仍建议移除已经放行的 443 端口：按实际放行方式二选一，如果 service 和 port 都存在就都移除：
+  - `sudo firewall-cmd --permanent --zone=public --remove-service=https`
+  - `sudo firewall-cmd --permanent --zone=public --remove-port=443/tcp`
 - 如果已有其他 443 相关的 rich rule，先用 `--list-rich-rules` 检查，避免出现更早执行（数值更小）的放行规则。
 
 ## 应用配置
@@ -171,7 +176,7 @@ sudo firewall-cmd --info-ipset=cloudflare_ipv6
 sudo firewall-cmd --list-all --zone=public
 ```
 
-`--info-ipset` 应该能看到 ipset 的类型、family 和条目数量；`--list-rich-rules` 应该能看到 4 条规则，如果忽略了 ipv6 的配置的话，应该是能看到 2 条规则。
+`--info-ipset` 应该能看到 ipset 的类型、family 和条目数量。`--list-rich-rules` 在同时配置 IPv4/IPv6 时应显示 4 条规则；如果跳过 IPv6，则应为 2 条。
 
 ## 验证效果
 
