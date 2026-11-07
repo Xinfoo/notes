@@ -27,7 +27,7 @@
 
 ## 技术栈
 
-- VitePress 2（当前为 `2.0.0-alpha.20`）
+- VitePress 2（最低要求 `2.0.0-alpha.20`，安装时取最新版本）
 - Vue 3
 - pnpm
 - gray-matter（构建期解析 frontmatter）
@@ -49,12 +49,14 @@
 │   └── theme/                # 自定义 MD3 主题
 │       └── vendor/           # 第三方 CSS 及其许可证
 ├── package.json
-└── pnpm-lock.yaml
+└── .npmrc                    # 关闭锁文件，安装时解析最新版本
 ```
 
 ## 本地开发
 
 需要 Node.js 和 pnpm。
+
+仓库不保留锁文件：`package.json` 中所有依赖只写 `>=` 最低版本，`.npmrc` 设置 `lockfile=false`，因此每次 `pnpm install` 都会下载当前可用的最新版本。构建前重新安装一次即可拿到最新依赖：
 
 ```bash
 pnpm install

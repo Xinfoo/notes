@@ -13,12 +13,12 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "gray-matter": "^4.0.3",
-    "vitepress": "2.0.0-alpha.20"
+    "gray-matter": ">=4.0.3",
+    "vitepress": ">=2.0.0-alpha.20"
   },
   "dependencies": {
-    "@fontsource-variable/jetbrains-mono": "^5.3.0",
-    "@fontsource-variable/noto-sans": "^5.3.0",
-    "@fontsource-variable/noto-sans-sc": "^5.3.1"
+    "@fontsource-variable/jetbrains-mono": ">=5.3.0",
+    "@fontsource-variable/noto-sans": ">=5.3.0",
+    "@fontsource-variable/noto-sans-sc": ">=5.3.1"
   }
 }
