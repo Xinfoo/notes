@@ -227,6 +227,10 @@ sudo firewall-cmd --reload
 
 删除和导入都是永久配置操作，执行 `--reload` 前不会影响当前运行时规则，因此不会出现“先删空、再导入”的中间断流窗口。
 
+## 安全边界
+
+上述规则只按来源 IP 过滤，能挡住大部分直接扫描源站 IP 的自动化攻击，但不能替代源站认证。Cloudflare 的回源 IP 由所有客户共享；如果还需要确认请求确实来自 Cloudflare，可以按需配置 [Authenticated Origin Pulls (mTLS)](https://developers.cloudflare.com/ssl/origin-configuration/authenticated-origin-pull/) 或使用 [Cloudflare Tunnel](https://developers.cloudflare.com/tunnel/)。
+
 ## 常见问题
 
 ### Cloudflare 也打不开，443 全部超时
