@@ -14,8 +14,8 @@ outline: [2, 3]
 ::: warning 操作前
 - 修改 DNS 可能导致短暂断网。通过 SSH 操作时，请先准备好本地控制台或回滚方式。
 - 本文假设网络连接由 NetworkManager 管理；如果使用 systemd-networkd、netctl 或其他工具，nmcli 部分不适用。
+- 请确保当前系统没有其他的 dns 管理工具，尤其是会接管 `/etc/resolv.conf` 的程序，否则会造成冲突。
 - `connection.dns-over-tls 2` 是严格模式：DoT 不可用时不会回退到明文 DNS，可用性会下降。
-- 浏览器可能自己启用 DoH，绕过系统解析器；系统级 DoT 不能强制浏览器走 DoT。
 :::
 
 ## 原理
@@ -296,45 +296,9 @@ DoT 只加密客户端到递归解析器之间的查询，不验证解析结果�
 
 VPN 建立后可能会下发新的 DNS 配置；公共 Wi-Fi 的强制门户也可能因为严格 DoT 而无法弹出。遇到这些情况，先临时切回 `1` 或 `0`，确认网络可用后再调整。
 
-## 常见问题
+### `/etc/resolv.conf` 可能会被某些软件修改
 
-### `resolvectl status` 里没有 `+DNSOverTLS`
-
-先确认连接设置确实写入了：
-
-```bash
-nmcli connection show "有线连接 1" | grep -E "dns|DNS"
-```
-
-然后重新应用连接：
-
-```bash
-sudo nmcli connection up "有线连接 1"
-```
-
-如果仍然没有，检查 NetworkManager 版本是否支持 `connection.dns-over-tls`，以及 `dns=systemd-resolved` 是否真的生效。
-
-### DNS 完全不可用
-
-按顺序检查：
-
-- DoT 服务器是否支持 853/TCP，SNI 是否与证书匹配
-- 出站 853 是否被防火墙拦截
-- `ipv4.dns` 里是否混入了不支持 DoT 的服务器
-- `/etc/resolv.conf` 是否指向 `stub-resolv.conf`
-- `systemd-resolved` 是否处于 active 状态
-
-用前面那条 `openssl s_client` 命令可以快速区分“网络到 853 不通”和“DNS 配置有问题”。
-
-### `/etc/resolv.conf` 又被改回去了
-
-某些网络管理工具、VPN 或容器运行时可能重写 `/etc/resolv.conf`。检查它是否仍然是 symlink：
-
-```bash
-ls -l /etc/resolv.conf
-```
-
-如果不是，重新执行前面的 `ln -sf`，并确认没有其他服务在管理这个文件。
+某些网络管理工具、代理软件或容器运行时可能重写 `/etc/resolv.conf`，可能会破坏预期的 DoT 配置。
 
 ## 参考资料
 

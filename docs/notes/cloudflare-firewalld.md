@@ -231,32 +231,6 @@ sudo firewall-cmd --reload
 
 上述规则只按来源 IP 过滤，能挡住大部分直接扫描源站 IP 的自动化攻击，但不能替代源站认证。Cloudflare 的回源 IP 由所有客户共享；如果还需要确认请求确实来自 Cloudflare，可以按需配置 [Authenticated Origin Pulls (mTLS)](https://developers.cloudflare.com/ssl/origin-configuration/authenticated-origin-pull/) 或使用 [Cloudflare Tunnel](https://developers.cloudflare.com/tunnel/)。
 
-## 常见问题
-
-### Cloudflare 也打不开，443 全部超时
-
-优先检查：
-
-- ipset 是否真的导入了条目：`--info-ipset=cloudflare_ipv4`
-- `--reload` 是否执行过
-- rich rule 的 priority 是否写反：如果 drop 的数值比 accept 更小，drop 会先执行
-- 实际网卡是否在 `public` zone
-- 源站 443 服务是否正常监听
-
-### 源站 IP 仍然能被直连
-
-可能的原因：
-
-- 网卡不在 `public` zone，规则没有作用到实际入口
-- 存在更早执行的放行规则（数值更小），先于 drop 匹配
-- 只配置了 IPv4，但源站同时暴露了 IPv6
-- 443 由 Docker 等工具发布，Docker 自己写入了转发/NAT 规则，需要单独确认
-- 修改后没有执行 `--reload`
-
-### 521 / 522 错误
-
-Cloudflare 521 通常表示源站拒绝连接，522 表示连接超时。先确认源站服务正在监听 443，再检查 firewalld 是否错误地丢弃了 Cloudflare 网段。`sudo ss -lntp | grep ':443'`、`firewall-cmd --list-rich-rules` 和 `firewall-cmd --info-ipset=cloudflare_ipv4` 是最直接的三个检查点。
-
 ## 参考资料
 
 - [Cloudflare IP Ranges](https://www.cloudflare.com/ips/)
