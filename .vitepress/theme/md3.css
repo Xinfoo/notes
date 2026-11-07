@@ -184,12 +184,14 @@
   border-color: var(--md-sys-color-on-surface);
 }
 
-.VPNavAppearance .VPSwitch.VPSwitchAppearance[aria-checked='true'] {
+.VPNavAppearance .VPSwitch.VPSwitchAppearance[aria-checked='true'],
+.dark .VPNavAppearance .VPSwitch.VPSwitchAppearance {
   border-color: var(--md-sys-color-primary);
   background-color: var(--md-sys-color-primary);
 }
 
-.VPNavAppearance .VPSwitch.VPSwitchAppearance[aria-checked='true']:hover {
+.VPNavAppearance .VPSwitch.VPSwitchAppearance[aria-checked='true']:hover,
+.dark .VPNavAppearance .VPSwitch.VPSwitchAppearance:hover {
   border-color: var(--md-sys-color-primary);
 }
 
@@ -216,7 +218,8 @@
   transform: translateY(-50%);
 }
 
-.VPNavAppearance .VPSwitch.VPSwitchAppearance[aria-checked='true'] .check {
+.VPNavAppearance .VPSwitch.VPSwitchAppearance[aria-checked='true'] .check,
+.dark .VPNavAppearance .VPSwitch.VPSwitchAppearance .check {
   left: 22px;
   width: 24px;
   height: 24px;

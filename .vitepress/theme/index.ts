@@ -61,10 +61,53 @@ function installRipple() {
   )
 }
 
+function installAppearanceSync() {
+  if (typeof window === 'undefined') return
+  if (document.documentElement.dataset.mdAppearanceSync === 'on') return
+  document.documentElement.dataset.mdAppearanceSync = 'on'
+
+  const sync = () => {
+    const checked = String(
+      document.documentElement.classList.contains('dark')
+    )
+
+    document
+      .querySelectorAll<HTMLElement>('.VPSwitchAppearance')
+      .forEach((el) => {
+        if (el.getAttribute('aria-checked') !== checked) {
+          el.setAttribute('aria-checked', checked)
+        }
+      })
+  }
+
+  let scheduled = false
+  const schedule = () => {
+    if (scheduled) return
+    scheduled = true
+    window.requestAnimationFrame(() => {
+      scheduled = false
+      sync()
+    })
+  }
+
+  // VitePress renders aria-checked=false during SSR. Starting in dark mode can
+  // leave the attribute stale after hydration, so follow the actual theme
+  // class and keep the switch state (including screen readers) in sync.
+  new MutationObserver(schedule).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['class'],
+    childList: true,
+    subtree: true
+  })
+
+  schedule()
+}
+
 export default {
   extends: DefaultTheme,
   enhanceApp({ app }) {
     app.component('NoteIndex', NoteIndex)
     installRipple()
+    installAppearanceSync()
   }
 } satisfies Theme
