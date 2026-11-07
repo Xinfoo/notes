@@ -253,14 +253,11 @@ resolvectl status
 重点看对应连接的部分，例如：
 
 ```text
-Link 2 (enp1s0)
-    Current Scopes: DNS
-         Protocols: +DefaultRoute +DNSOverTLS DNSSEC=no/unsupported
+Link 2 (enp2s0)
+    Current Scopes: DNS LLMNR/IPv4 LLMNR/IPv6 mDNS/IPv4 mDNS/IPv6
+         Protocols: +DefaultRoute +LLMNR +mDNS +DNSOverTLS DNSSEC=no/unsupported
 Current DNS Server: 223.5.5.5#dns.alidns.com
-       DNS Servers: 223.5.5.5#dns.alidns.com
-                    223.6.6.6#dns.alidns.com
-                    8.8.8.8#dns.google
-                    8.8.4.4#dns.google
+       DNS Servers: 223.5.5.5#dns.alidns.com 223.6.6.6#dns.alidns.com 8.8.8.8#dns.google 8.8.4.4#dns.google
      Default Route: yes
 ```
 
