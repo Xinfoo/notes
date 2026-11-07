@@ -176,7 +176,7 @@ sudo firewall-cmd --info-ipset=cloudflare_ipv6
 sudo firewall-cmd --list-all --zone=public
 ```
 
-`--info-ipset` 应该能看到 ipset 的类型、family 和条目数量。`--list-rich-rules` 在同时配置 IPv4/IPv6 时应显示 4 条规则；如果跳过 IPv6，则应为 2 条。
+`--info-ipset` 应该能看到 ipset 的类型、family 和条目数量。`--list-rich-rules` 在同时配置 IPv4/IPv6 时应显示新增的 4 条规则；如果跳过 IPv6，则应为 2 条。
 
 ## 验证效果
 
