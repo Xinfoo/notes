@@ -150,19 +150,6 @@ cat /etc/resolv.conf
 dns=systemd-resolved
 ```
 
-确认配置已经生效：
-
-```bash
-NetworkManager --print-config | grep -A2 '^\[main\]'
-```
-
-输出里应该能看到：
-
-```text
-[main]
-dns=systemd-resolved
-```
-
 如果 `conf.d` 里其他文件也设置了 `dns=`，以最后加载的配置为准；可以先检查：
 
 ```bash
