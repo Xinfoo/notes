@@ -127,8 +127,8 @@ sudo firewall-cmd --permanent --ipset=cloudflare_ipv6 --add-entries-from-file=/r
 确认条目已经写入永久配置：
 
 ```bash
-sudo firewall-cmd --permanent --ipset=cloudflare_ipv4 --get-entries | less
-sudo firewall-cmd --permanent --ipset=cloudflare_ipv6 --get-entries | less
+sudo firewall-cmd --permanent --ipset=cloudflare_ipv4 --get-entries | head -n 20
+sudo firewall-cmd --permanent --ipset=cloudflare_ipv6 --get-entries | head -n 20
 ```
 
 ## 添加 rich rule
@@ -151,7 +151,7 @@ sudo firewall-cmd --permanent --zone=public --add-rich-rule='rule family="ipv6" 
 
 - 命令的添加顺序不影响最终匹配顺序，真正决定顺序的是 `priority`。
 - `drop` 是静默丢弃，客户端通常看到连接超时；如果想立即拒绝，可以改成 `reject`，但 `drop` 更不容易暴露防火墙的存在。
-- 如果 zone 里原本已经允许 `https` 服务，这两条负优先级的 rich rule 会先于普通规则执行，仍然能实现“只允许 Cloudflare”的效果，但是仍然推荐移除已经放行的 443 端口，这时运行 `sudo firewall-cmd --permanent --remove-service=https` 或 `sudo firewall-cmd --permanent --remove-port=443/tcp` 。
+- 如果 zone 里原本已经允许 `https` 服务，这两条负优先级的 rich rule 会先于普通规则执行，仍然能实现“只允许 Cloudflare”的效果，但是仍然推荐移除已经放行的 443 端口，这时运行 `sudo firewall-cmd --permanent --zone=public --remove-service=https` 或 `sudo firewall-cmd --permanent --zone=public --remove-port=443/tcp` 。
 - 如果已有其他 443 相关的 rich rule，先用 `--list-rich-rules` 检查，避免出现更早执行（数值更小）的放行规则。
 
 ## 应用配置
@@ -171,7 +171,7 @@ sudo firewall-cmd --info-ipset=cloudflare_ipv6
 sudo firewall-cmd --list-all --zone=public
 ```
 
-`--info-ipset` 应该能看到 ipset 的类型、family 和条目数量；`--list-rich-rules` 应该能看到 4 条规则。
+`--info-ipset` 应该能看到 ipset 的类型、family 和条目数量；`--list-rich-rules` 应该能看到 4 条规则，如果忽略了 ipv6 的配置的话，应该是能看到 2 条规则。
 
 ## 验证效果
 
