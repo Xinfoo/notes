@@ -48,15 +48,12 @@
 │   ├── note-utils.mts        # 标题与更新时间解析、排序
 │   └── theme/                # 自定义 MD3 主题
 │       └── vendor/           # 第三方 CSS 及其许可证
-├── package.json
-└── .npmrc                    # 关闭锁文件，安装时解析最新版本
+└── package.json
 ```
 
 ## 本地开发
 
 需要 Node.js 和 pnpm。
-
-仓库不保留锁文件：`package.json` 中所有依赖只写 `>=` 最低版本，`.npmrc` 设置 `lockfile=false`，因此每次 `pnpm install` 都会下载当前可用的最新版本。构建前重新安装一次即可拿到最新依赖：
 
 ```bash
 pnpm install
