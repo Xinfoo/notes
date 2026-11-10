@@ -332,7 +332,7 @@ Server = https://mirrors.tuna.tsinghua.edu.cn/archlinux/$repo/os/$arch
 
 之后按 esc 键退出插入模式，用键盘输入 : 符号进入 vim 的命令模式，输入 wq 加回车，保存并退出。如果写错了的话，在编辑模式按 x 键删除光标所在的文字，输入 q! 不保存退出。
 
-或者，你也可以使用 curl 从 Arch Linux 官方网站上下载一份符合所在地区的镜像站列表，例如下载适用中国地区的镜像站列表：
+或者，您也可以使用 curl 从 Arch Linux 官方网站上下载一份符合所在地区的镜像站列表，例如下载适用中国地区的镜像站列表：
 
 ```zsh
 curl -L 'https://archlinux.org/mirrorlist/?country=CN&protocol=https' -o /etc/pacman.d/mirrorlist
@@ -1069,7 +1069,7 @@ reboot
 
 [关于 Arch Linux 和其他发行版的区别](https://wiki.archlinuxcn.org/wiki/Arch_与其他发行版的比较)
 
-[如何不弄坏你的 Arch Linux](https://wiki.archlinuxcn.org/wiki/建议阅读/给新用户的关于如何不去弄坏_Arch_Linux_系统的建议)
+[如何不弄坏您的 Arch Linux](https://wiki.archlinuxcn.org/wiki/建议阅读/给新用户的关于如何不去弄坏_Arch_Linux_系统的建议)
 
 [建议阅读](https://wiki.archlinuxcn.org/wiki/建议阅读)
 
