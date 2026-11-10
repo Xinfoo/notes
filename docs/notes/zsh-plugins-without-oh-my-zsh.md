@@ -63,13 +63,13 @@ ls /usr/share/zsh/plugins/*/*.zsh
 
 ```zsh
 # 历史建议
-source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source "/usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
 
 # 语法高亮
-source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source "/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 
 # 历史子串搜索
-source /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
+source "/usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
 
 # 把 Up/Down 绑定到子串搜索（grml-zsh-config 提供的函数）
 bind2maps emacs viins vicmd -- Up   history-substring-search-up
