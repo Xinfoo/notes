@@ -48,6 +48,8 @@
 │   ├── note-utils.mts        # 标题与更新时间解析、排序
 │   └── theme/                # 自定义 MD3 主题
 │       └── vendor/           # 第三方 CSS 及其许可证
+├── deploy/
+│   └── nginx-example/        # Nginx 配置模板
 └── package.json
 ```
 
@@ -70,6 +72,34 @@ pnpm docs:preview
 ```
 
 站点启用了 `cleanUrls`，页面链接不带 `.html`。构建产物中仍是 `*.html` 文件，部署服务器需要把 `/foo` 映射到 `/foo.html`：Netlify、GitHub Pages 默认支持，Vercel 需在 `vercel.json` 中开启 `cleanUrls`。
+
+## 部署
+
+`deploy/nginx-example/` 下有一份基于 VitePress 官方示例改写的 Nginx 配置模板，供自建服务器部署时参考：
+
+- `website.conf`：站点 server 配置，包含 HTTP → HTTPS 跳转、www 归一、HTTP/2、HTTP/3 和静态资源缓存；
+- `headers.conf`：安全响应头，建议放到 `/etc/nginx/snippets/` 下，再在 server 或 location 里 `include`。
+
+模板不能直接使用，需要先替换这些占位符：
+
+| 占位符 | 替换为 |
+| --- | --- |
+| `example.com`、`www.example.com` | 你的域名 |
+| `<SSL 证书路径>`、`<SSL 证书私钥路径>` | 证书和私钥文件 |
+| `<VitePress dist 输出路径>` | `pnpm docs:build` 输出的 `dist` 目录 |
+| `<headers.conf 的 Nginx 相对路径>` | 实际的 `include` 路径 |
+
+### 注意事项
+
+- `http2 on` 需要 nginx ≥ 1.25.1；HTTP/3 需要 ≥ 1.25.0 且编译时带 `--with-http_v3_module`（`nginx -V | grep http_v3` 可确认）；`ssl_reject_handshake` 需要 ≥ 1.19.4。
+- HTTP/3 使用 UDP，防火墙需要放行 **443/UDP**；只开 TCP 443 时 QUIC 会静默失效，浏览器仍会回落到 HTTP/2。
+- 证书要覆盖 `www` 和裸域，否则访问 www 的 301 会先报证书错误。
+- HSTS 里的 `preload` 只是声明，需要到 [hstspreload.org](https://hstspreload.org/) 提交才会进入预加载列表；`includeSubDomains` 要求所有子域都能走 HTTPS，且提交后移除很慢，确认后再启用。
+- 只启用 TLS 1.3 是有意取舍：更安全，但会拒绝部分旧客户端；需要兼容时改成 `TLSv1.2 TLSv1.3`。
+- `expires` 与 `add_header Cache-Control` 并用时会产生两条缓存头，浏览器会自行合并，不影响缓存效果。
+- 修改后先 `nginx -t` 校验，再 `systemctl reload nginx` 生效。
+
+模板中的部分写法（例如 TLS 1.3-only、静态资源长缓存）是有意选择，不是遗漏；调整前请确认影响。
 
 ## 新增笔记
 
