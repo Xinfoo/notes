@@ -159,6 +159,7 @@ export default defineConfig({
   head: [['link', { rel: 'icon', href: '/icon.png', type: 'image/png' }]],
 
   markdown: {
+    math: true,
     theme: {
       light: 'material-theme-lighter',
       dark: 'material-theme'
