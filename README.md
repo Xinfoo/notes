@@ -50,7 +50,8 @@
 ├── templates/                # 笔记与分类页模板，不参与构建
 │   ├── note-template.md
 │   ├── note-template-no-comments.md
-│   └── category-index.md
+│   ├── category-index.md
+│   └── category-index-no-comments.md
 ├── .vitepress/
 │   ├── config.mts            # 站点配置、自动导航/侧栏
 │   ├── note-utils.mts        # 标题解析与排序
@@ -134,7 +135,7 @@ title: 笔记标题
 把一个目录变成分类：
 
 1. 在 `docs/` 下新建目录，目录名会出现在 URL 里，例如 `docs/system/` 对应 `/system/`；
-2. 把 [分类页模板](templates/category-index.md) 复制为 `docs/system/index.md`；
+2. 把分类页模板复制为 `docs/system/index.md`：[带注释](templates/category-index.md) / [无注释](templates/category-index-no-comments.md)；
 3. 修改 `index.md` 的 `title`，它决定分类在首页、顶部导航和左侧栏里的名称；
 4. 分类下的文章直接放进该目录；子分类再建子目录，重复以上步骤。
 
