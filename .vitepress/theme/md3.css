@@ -544,13 +544,6 @@
   line-height: var(--md-sys-typescale-display-small-line-height);
 }
 
-.vp-doc .note-updated {
-  margin: -8px 0 24px;
-  color: var(--md-sys-color-on-surface-variant);
-  font-size: 14px;
-  line-height: 1.5;
-}
-
 .vp-doc h2 {
   margin: 40px 0 12px;
   padding-top: 0;
@@ -1067,10 +1060,17 @@
   gap: 8px;
 }
 
-.note-index-date {
+.note-index-kind {
   color: var(--md-sys-color-on-surface-variant);
   font-size: 13px;
   line-height: 1.5;
+}
+
+.note-index-empty {
+  margin: 0;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 15px;
+  line-height: 1.7;
 }
 
 .note-index-action {

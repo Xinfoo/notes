@@ -1,33 +1,150 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { defineConfig } from 'vitepress'
-import { normalizeDate, parseNoteSource, sortNotes } from './note-utils.mts'
+import { defineConfig, type DefaultTheme } from 'vitepress'
+import { compareTitles, parseNoteSource } from './note-utils.mts'
 
 const configDir = path.dirname(fileURLToPath(import.meta.url))
-const notesDir = path.resolve(configDir, '../docs/notes')
+const docsDir = path.resolve(configDir, '../docs')
 
-const notes = fs.existsSync(notesDir)
-  ? sortNotes(
-      fs
-        .readdirSync(notesDir)
-        .filter((file) => file.endsWith('.md') && file !== 'index.md')
-        .map((file) => {
-          const slug = file.replace(/\.md$/, '')
-          const { title, updated } = parseNoteSource(
-            fs.readFileSync(path.join(notesDir, file), 'utf8'),
-            slug
-          )
+/** Root-level names that would collide with generated routes or assets. */
+const RESERVED_NAMES = new Set(['assets', 'public', '404'])
 
-          return { text: title, link: `/notes/${slug}`, updated, slug }
-        }),
-      (note) => note.slug
-    ).map(({ text, link }) => ({ text, link }))
+interface NoteItem {
+  title: string
+  link: string
+  slug: string
+}
+
+interface DirItem {
+  name: string
+  title: string
+  link: string
+  hasIndex: boolean
+  dirs: DirItem[]
+  notes: NoteItem[]
+}
+
+function readTitle(file: string, fallback: string): string {
+  return parseNoteSource(fs.readFileSync(file, 'utf8'), fallback).title
+}
+
+/**
+ * A directory is a category. Its `index.md` provides the display name used in
+ * the parent index and acts as the category page itself.
+ */
+function scanDir(absDir: string, relDir: string): DirItem {
+  const entries = fs.readdirSync(absDir, { withFileTypes: true })
+  const indexFile = path.join(absDir, 'index.md')
+  const hasIndex = fs.existsSync(indexFile)
+  const fallbackTitle = path.basename(absDir)
+  const dirs: DirItem[] = []
+  const notes: NoteItem[] = []
+
+  for (const entry of entries) {
+    const name = entry.name
+    if (name.startsWith('.')) continue
+
+    if (entry.isDirectory()) {
+      // `public` is VitePress's static asset directory, not a category.
+      if (!relDir && name === 'public') continue
+      const childRel = relDir ? `${relDir}/${name}` : name
+      dirs.push(scanDir(path.join(absDir, name), childRel))
+      continue
+    }
+
+    if (!entry.isFile() || !name.endsWith('.md') || name === 'index.md') {
+      continue
+    }
+
+    const slug = name.replace(/\.md$/, '')
+    notes.push({
+      title: readTitle(path.join(absDir, name), slug),
+      link: relDir ? `/${relDir}/${slug}` : `/${slug}`,
+      slug
+    })
+  }
+
+  dirs.sort((a, b) => compareTitles(a.title, b.title))
+  notes.sort((a, b) => compareTitles(a.title, b.title))
+
+  return {
+    name: path.basename(absDir),
+    title: hasIndex ? readTitle(indexFile, fallbackTitle) : fallbackTitle,
+    link: relDir ? `/${relDir}/` : '/',
+    hasIndex,
+    dirs,
+    notes
+  }
+}
+
+function warnMissingIndex(dir: DirItem, relDir: string): void {
+  if (!dir.hasIndex) {
+    console.warn(
+      `[note-index] 目录缺少 index.md，不会出现在索引和导航中：docs/${relDir}`
+    )
+  }
+
+  for (const child of dir.dirs) {
+    warnMissingIndex(child, `${relDir}/${child.name}`)
+  }
+}
+
+function toSidebarItem(dir: DirItem): DefaultTheme.SidebarItem {
+  const items: DefaultTheme.SidebarItem[] = [
+    ...dir.dirs.map(toSidebarItem),
+    ...dir.notes.map((note) => ({ text: note.title, link: note.link }))
+  ]
+
+  const item: DefaultTheme.SidebarItem = {
+    text: dir.title,
+    collapsed: false
+  }
+
+  // A category without index.md has no page to link to, so it stays a group.
+  if (dir.hasIndex) item.link = dir.link
+  if (items.length) item.items = items
+
+  return item
+}
+
+const root = scanDir(docsDir, '')
+
+root.notes = root.notes.filter((note) => {
+  if (!RESERVED_NAMES.has(note.slug)) return true
+  console.warn(
+    `[note-index] 笔记使用了保留名称，已从索引中忽略：docs/${note.slug}.md`
+  )
+  return false
+})
+
+root.dirs = root.dirs.filter((dir) => {
+  if (!RESERVED_NAMES.has(dir.name)) return true
+  console.warn(
+    `[note-index] 分类使用了保留名称，已从索引中忽略：docs/${dir.name}/`
+  )
+  return false
+})
+
+for (const dir of root.dirs) {
+  warnMissingIndex(dir, dir.name)
+}
+
+const navItems = [
+  ...root.dirs
+    .filter((dir) => dir.hasIndex)
+    .map((dir) => ({ text: dir.title, link: dir.link })),
+  ...root.notes.map((note) => ({ text: note.title, link: note.link }))
+]
+
+const noteNav = navItems.length
+  ? [{ text: '笔记', activeMatch: '^/(?!$)', items: navItems }]
   : []
 
-const noteNav = notes.length
-  ? [{ text: '笔记', activeMatch: '^/notes/', items: notes }]
-  : []
+const sidebar: DefaultTheme.SidebarItem[] = [
+  ...root.dirs.map(toSidebarItem),
+  ...root.notes.map((note) => ({ text: note.title, link: note.link }))
+]
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -48,46 +165,6 @@ export default defineConfig({
     codeCopyButton: {
       tooltipText: '复制代码',
       copiedText: '已复制'
-    },
-
-    config(md) {
-      // Render the update date from frontmatter right below the first H1.
-      md.core.ruler.push('note-updated', (state) => {
-        const { frontmatter, relativePath } = (state.env ?? {}) as {
-          frontmatter?: Record<string, unknown>
-          relativePath?: string
-        }
-
-        if (!relativePath?.startsWith('notes/')) return
-
-        const updated = normalizeDate(frontmatter?.updated)
-        if (!updated) return
-
-        const headingIndex = state.tokens.findIndex(
-          (token) => token.type === 'heading_open' && token.tag === 'h1'
-        )
-        if (headingIndex === -1) return
-
-        const headingCloseIndex = state.tokens.findIndex(
-          (token, index) =>
-            index > headingIndex && token.type === 'heading_close'
-        )
-        if (headingCloseIndex === -1) return
-
-        const open = new state.Token('paragraph_open', 'p', 1)
-        open.attrSet('class', 'note-updated')
-
-        const text = new state.Token('text', '', 0)
-        text.content = `上次更新时间：${updated}`
-
-        const inline = new state.Token('inline', '', 0)
-        inline.content = text.content
-        inline.children = [text]
-
-        const close = new state.Token('paragraph_close', 'p', -1)
-
-        state.tokens.splice(headingCloseIndex + 1, 0, open, inline, close)
-      })
     }
   },
 
@@ -96,7 +173,7 @@ export default defineConfig({
 
     nav: [{ text: '首页', link: '/' }, ...noteNav],
 
-    sidebar: notes,
+    sidebar,
 
     socialLinks: [
       {
