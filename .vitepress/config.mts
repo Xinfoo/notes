@@ -151,6 +151,7 @@ export default defineConfig({
   lang: 'zh-CN',
   srcDir: 'docs',
   cleanUrls: true,
+  lastUpdated: true,
 
   title: '笔记',
   description: '一个持续积累的个人文档库。',
@@ -191,6 +192,14 @@ export default defineConfig({
     docFooter: {
       prev: '上一篇',
       next: '下一篇'
+    },
+
+    lastUpdated: {
+      text: '上次更新',
+      formatOptions: {
+        dateStyle: 'long',
+        forceLocale: true
+      }
     },
 
     returnToTopLabel: '回到顶部',
