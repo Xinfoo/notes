@@ -1,7 +1,6 @@
 ---
 title: 针对 Cloudflare CDN 的 firewalld 配置方法
 description: 使用 firewalld 的 ipset 与 rich rule，只允许 Cloudflare 节点访问源站 443/TCP，丢弃其他来源；不包含 IP 池自动更新。
-updated: 2026-11-06
 outline: [2, 3]
 ---
 

@@ -1,7 +1,6 @@
 ---
 title: 不使用 oh-my-zsh 配置 zsh 插件
 description: 在 Arch Linux 上用 pacman 安装 grml-zsh-config 与三个 zsh 插件，在 ~/.zshrc 中手动加载并绑定按键，不依赖 oh-my-zsh 或插件管理器。
-updated: 2026-11-10
 outline: [2, 3]
 ---
 

@@ -1,7 +1,6 @@
 ---
 title: 为 Arch Linux 配置 DNS over TLS
 description: 使用 systemd-resolved 与 NetworkManager 配置 DoT 加密 DNS，替换系统解析器并验证加密状态。
-updated: 2026-11-07
 outline: [2, 3]
 ---
 
