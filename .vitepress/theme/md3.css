@@ -362,27 +362,13 @@
   padding-bottom: 8px;
 }
 
-/* Let the whole row behave like one Material navigation pill. */
+/* The row is one pill; the link fills it so background, state layer and
+   ripple all cover the caret area too. */
 .VPSidebar .VPSidebarItem > .item {
+  position: relative;
   align-items: center;
   min-height: 56px;
   border-radius: var(--md-sys-shape-corner-full);
-  transition: background-color var(--md-sys-motion-duration-short4)
-    var(--md-sys-motion-easing-standard);
-}
-
-.VPSidebar .VPSidebarItem > .item:hover {
-  background-color: color-mix(
-    in srgb,
-    var(--md-sys-color-on-surface) 8%,
-    transparent
-  );
-}
-
-.VPSidebar .VPSidebarItem.is-active > .item,
-.VPSidebar .VPSidebarItem.is-active > .item:hover {
-  color: var(--md-sys-color-on-secondary-container);
-  background-color: var(--md-sys-color-secondary-container);
 }
 
 .VPSidebar .VPSidebarItem > .item > .link {
@@ -390,7 +376,7 @@
   align-items: center;
   flex-grow: 1;
   min-height: 56px;
-  padding: 0 8px 0 16px;
+  padding: 0 44px 0 16px;
   border-radius: inherit;
   color: var(--md-sys-color-on-surface-variant);
   background-color: transparent;
@@ -403,10 +389,14 @@
   background-color: transparent;
 }
 
+.VPSidebar .VPSidebarItem.is-active > .item {
+  color: var(--md-sys-color-on-secondary-container);
+}
+
 .VPSidebar .VPSidebarItem.is-active > .item > .link,
 .VPSidebar .VPSidebarItem.is-active > .item > .link:hover {
   color: inherit;
-  background-color: transparent;
+  background-color: var(--md-sys-color-secondary-container);
 }
 
 .VPSidebar .VPSidebarItem > .item > .link > .text,
@@ -423,7 +413,7 @@
 }
 
 .VPSidebar .VPSidebarItem > .item > .text {
-  padding: 0 8px 0 16px;
+  padding: 0 44px 0 16px;
 }
 
 .VPSidebar .VPSidebarItem > .item > .link > .text::before,
@@ -447,7 +437,12 @@
 }
 
 .VPSidebar .VPSidebarItem > .item > .caret {
-  margin-inline-end: 8px;
+  position: absolute;
+  inset-inline-end: 6px;
+  top: 50%;
+  z-index: 1;
+  margin: 0;
+  transform: translateY(-50%);
   width: 32px;
   height: 32px;
   color: inherit;
@@ -459,8 +454,8 @@
 }
 
 .VPSidebar .nav .VPSidebarItem .items {
-  margin-left: 20px;
-  padding-left: 16px;
+  margin-left: 14px;
+  padding-left: 14px;
   border-left: 0;
   border-inline-start: 0;
 }
