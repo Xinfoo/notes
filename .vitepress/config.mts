@@ -98,7 +98,9 @@ function toSidebarItem(dir: DirItem): DefaultTheme.SidebarItem {
 
   const item: DefaultTheme.SidebarItem = {
     text: dir.title,
-    collapsed: false
+    // Collapsed by default; VitePress expands the group that contains the
+    // current page automatically.
+    collapsed: true
   }
 
   // A category without index.md has no page to link to, so it stays a group.
