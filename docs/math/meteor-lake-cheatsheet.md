@@ -1,11 +1,11 @@
 ---
-title: Mateor Lake的数学速查表
-description: Mateor Lake 整理的数学公式速查表，覆盖极限、导数、积分、微分方程、空间解析几何与多元微积分。
+title: Meteor Lake的数学速查表
+description: Meteor Lake 整理的数学公式速查表，覆盖极限、导数、积分、微分方程、空间解析几何与多元微积分。
 ---
 
-# Mateor Lake的数学速查表
+# Meteor Lake的数学速查表
 
-本表由 Mateor Lake 整理。$\square$ 表示复合内层整体；标「必」的是高频必背结论。
+本表由 Meteor Lake 整理。$\square$ 表示复合内层整体；标「必」的是高频必背结论。
 
 ## 一、极限：等价无穷小与泰勒
 
