@@ -86,7 +86,6 @@ const description = computed(() => {
           <span v-if="category.description" class="note-index-desc">
             {{ category.description }}
           </span>
-          <span class="note-index-kind">分类</span>
         </span>
         <span class="note-index-action">
           查看分类

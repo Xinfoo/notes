@@ -1106,12 +1106,6 @@ mjx-container[jax='SVG'][display='true'] {
   line-height: 1.6;
 }
 
-.note-index-kind {
-  color: var(--md-sys-color-on-surface-variant);
-  font-size: 13px;
-  line-height: 1.5;
-}
-
 .note-index-description {
   max-width: 44rem;
   margin: 0 0 24px;
