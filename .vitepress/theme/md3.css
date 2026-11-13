@@ -1095,6 +1095,17 @@ mjx-container[jax='SVG'][display='true'] {
   gap: 8px;
 }
 
+.note-index-desc {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
 .note-index-kind {
   color: var(--md-sys-color-on-surface-variant);
   font-size: 13px;

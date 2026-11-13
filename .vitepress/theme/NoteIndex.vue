@@ -83,6 +83,9 @@ const description = computed(() => {
       >
         <span class="note-index-copy">
           <span class="note-index-card-title">{{ category.title }}</span>
+          <span v-if="category.description" class="note-index-desc">
+            {{ category.description }}
+          </span>
           <span class="note-index-kind">分类</span>
         </span>
         <span class="note-index-action">
@@ -99,6 +102,9 @@ const description = computed(() => {
       >
         <span class="note-index-copy">
           <span class="note-index-card-title">{{ note.title }}</span>
+          <span v-if="note.description" class="note-index-desc">
+            {{ note.description }}
+          </span>
         </span>
         <span class="note-index-action">
           打开笔记

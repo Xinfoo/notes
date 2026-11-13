@@ -3,6 +3,7 @@ import { parseNoteSource } from '../.vitepress/note-utils.mts'
 
 export interface NoteIndexEntry {
   title: string
+  description: string
   url: string
   /** Directory the page belongs to: '' for the root, 'cat' for cat/, 'cat/sub' for cat/sub/. */
   dir: string
@@ -34,8 +35,12 @@ export default createContentLoader(['**/*.md', '!public/**'], {
       .map((page) => {
         const { dir, isIndex, fallback } = splitUrl(page.url)
         const { title } = parseNoteSource(page.src ?? '', fallback)
+        const description =
+          typeof page.frontmatter.description === 'string'
+            ? page.frontmatter.description.trim()
+            : ''
 
-        return { title, url: page.url, dir, isIndex }
+        return { title, description, url: page.url, dir, isIndex }
       })
   }
 })
