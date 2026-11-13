@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useData } from 'vitepress'
 import { data as entries } from '../../docs/notes.data.mts'
 
-const { page } = useData()
+const { page, frontmatter } = useData()
 
 const collator = new Intl.Collator('zh-CN', {
   numeric: true,
@@ -46,11 +46,21 @@ const notes = computed(() =>
 const isEmpty = computed(
   () => categories.value.length === 0 && notes.value.length === 0
 )
+
+/**
+ * Category pages can describe themselves in frontmatter; the homepage ignores
+ * it here because the site description already covers that role.
+ */
+const description = computed(() => {
+  if (!currentDir.value) return ''
+  const value = frontmatter.value.description
+  return typeof value === 'string' ? value.trim() : ''
+})
 </script>
 
 <template>
   <section
-    v-if="!isEmpty"
+    v-if="currentDir || !isEmpty"
     class="note-index"
     :aria-labelledby="currentDir ? undefined : 'note-index-title'"
   >
@@ -58,7 +68,13 @@ const isEmpty = computed(
       笔记索引
     </h2>
 
-    <nav class="note-index-grid" :aria-label="currentDir ? '子项' : '笔记索引'">
+    <p v-if="description" class="note-index-description">{{ description }}</p>
+
+    <nav
+      v-if="!isEmpty"
+      class="note-index-grid"
+      :aria-label="currentDir ? '子项' : '笔记索引'"
+    >
       <a
         v-for="category in categories"
         :key="category.url"
@@ -90,9 +106,7 @@ const isEmpty = computed(
         </span>
       </a>
     </nav>
-  </section>
 
-  <section v-else-if="currentDir" class="note-index">
-    <p class="note-index-empty">这个分类还没有内容。</p>
+    <p v-else class="note-index-empty">这个分类还没有内容。</p>
   </section>
 </template>
