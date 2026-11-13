@@ -651,7 +651,7 @@
 .vp-doc hr {
   margin: 40px 0;
   border: 0;
-  border-top: 1px solid var(--md-sys-color-outline-variant);
+  border-top: 1px solid var(--md-sys-color-outline);
 }
 
 .vp-doc blockquote {
