@@ -1,7 +1,7 @@
 ---
 title: Arch Linux 安装笔记
 description: 从 Live 环境到桌面环境的 Arch Linux 安装过程记录，涵盖磁盘分区、内核、驱动、桌面环境与系统引导。
-outline: [2, 4]
+outline: [2, 5]
 ---
 
 # Arch Linux 安装笔记
@@ -354,7 +354,7 @@ pacman -Syy
 例如：
 
 ```zsh
-pacstrap -K /mnt base base-devel linux-zen linux-zen-headers linux-firmware intel-ucode xfsprogs btrfs-progs exfatprogs dosfstools f2fs-tools ntfs-3g nano vi vim man-db man-pages texinfo
+pacstrap -K /mnt base base-devel linux-zen linux-zen-headers linux-firmware sof-firmware intel-ucode xfsprogs btrfs-progs exfatprogs dosfstools f2fs-tools ntfsprogs nano vi vim man-db man-pages texinfo
 ```
 
 ::: warning 注意
@@ -371,7 +371,9 @@ pacstrap -K /mnt base base-devel linux-zen linux-zen-headers linux-firmware inte
 
 - linux-firmware 驱动包，里面包含了多个驱动，为了避免您并非全部了解的主机上的其他设备无法工作，这个包必须安装。
 
-- xfsprogs、btrfs-progs、exfatprogs、dosfstools、f2fs-tools、ntfs-3g 这些是几个常用文件系统的管理工具，有了这些您才能在之后处理这些文件系统的分区格式化之类的操作，建议安装。
+- xfsprogs、btrfs-progs、exfatprogs、dosfstools、f2fs-tools、ntfsprogs 这些是几个常用文件系统的管理工具，有了这些您才能在之后处理这些文件系统的分区格式化之类的操作，建议安装。
+
+- sof-firmware 内建音频驱动包，笔记本电脑上通常需要，在台式机上可以移除。
 
 - intel-ucode 这是 CPU 微码包，如果您的主机使用的是 AMD CPU ，请换成 amd-ucode ，如果您是虚拟机，则不需要这个包。
 
@@ -489,6 +491,22 @@ LANG=en_US.UTF-8
 如果在此处设置为中文 locale，比如 LANG=zh_CN.UTF-8 ，这可能会导致 tty 上中文显示为方块（因为 TTY 下没有 CJK 字体）。我们推荐在这里保持 locale 为英文，之后在桌面环境中设置中文。
 :::
 
+接下来设置键盘布局，使用 vim 创建并编辑：
+
+```bash
+vim /etc/vconsole.conf
+```
+
+输入以下内容设置键盘布局：
+
+```text
+KEYMAP=<使用的键盘布局>
+```
+
+::: info 提示
+例如，在中国大陆需要将键盘设置为美式键盘，这时写入 `KEYMAP=us` 即可，如果想要查找更多区域的键盘布局请查阅 [Linux 控制台/键盘配置](https://wiki.archlinuxcn.org/wiki/Linux_console/Keyboard_configuration)。
+:::
+
 ---
 
 ### 5、网络配置
@@ -560,7 +578,7 @@ vim /etc/hosts
 ```text
 127.0.0.1        localhost
 ::1              localhost
-127.0.0.1        (您的主机名).localdomain (您的主机名)
+127.0.1.1        (您的主机名).localdomain (您的主机名)
 ```
 
 网络配置完毕。
@@ -569,7 +587,57 @@ vim /etc/hosts
 
 ### 6、安装显卡驱动
 
-对于使用 Intel 显卡和 AMD 以及旧的 ATI 显卡用户来说，以上这些显卡的驱动都包含在 linux-firmware 包中，这时通常是开箱即用的，不需要手动配置，这类显卡的用户请跳过这一章节，继续下一章。在这里着重说明 NVIDIA 显卡驱动。
+由于作这篇文章是作者只有这两种显卡硬件，并且没有笔记本，所以只有这两种显卡驱动单独的安装方法，涉及笔记本多显卡或者 AMD 显卡，请参考：
+
+[NVIDIA](https://wiki.archlinux.org/title/NVIDIA)
+
+[NVIDIA Optimus](https://wiki.archlinux.org/title/NVIDIA_Optimus)
+
+[AMDGPU](https://wiki.archlinux.org/title/AMDGPU)
+
+[Intel graphics](https://wiki.archlinux.org/title/Intel_graphics)
+
+#### Intel 显卡驱动
+
+由于 Intel 提供并支持开源驱动程序，驱动通常已经包含在了 linux-firmware 包中，因此 Intel 显卡基本上是即插即用的，但是只安装 linux-firmware 并不能确保功能完备，特殊情况仍然需要手动配置。
+
+首先需要确保安装了 mesa，通常情况下，mesa 已经作为 linux-firmware 的依赖安装，在这里建议确认一下：
+
+```bash
+pacman -Q | grep -i mesa
+```
+
+如果输出中显示 mesa 证明已经安装。
+
+有时默认提供的 mesa 包并不在某些旧的硬件下有良好表现，所以 Arch Linux 提供了多个 mesa 包可选。
+
+- **mesa** 是最新的 Mesa 软件包，其中包括用于 Intel 第 3 代及更高版本硬件的现代 Gallium3D 驱动程序。这是推荐选择。
+
+- **mesa-amber** 是旧版 Mesa 软件包，包括用于第 2 代至第 11 代硬件的经典（非 Gallium3D）驱动程序。此驱动程序对于第 7 代和较旧的硬件具有更好的性能和稳定性，但是不再维护。
+
+如果缺失 mesa 包，或者包的版本不符合情况，使用 `pacman -S <要安装的 mesa 包>` 来安装它。
+
+如果安装时什么都不做的话，驱动程序默认不包含 Vulkan 的支持，这时需要安装它：
+
+```bash
+pacman -S vulkan-intel
+```
+
+在默认安装的情况下，驱动程序也不会对硬件视频编解码支持，这时需要手动配置，有多个包可供选择：
+
+- **intel-media-driver** [Broadwell (~2014)](https://github.com/intel/media-driver/#supported-platforms) 及之后的 HD Graphics 系列（例如英特尔 Arc 系列显卡）使用它。
+
+- **libva-intel-driver** GMA 4500 (2008) 到 [Coffee Lake (2017)](https://en.wikipedia.org/wiki/Coffee_Lake) 的 GPU，请使用它。
+
+使用 pacman 安装，例如安装 intel-media-driver：
+
+```bash
+pacman -S intel-media-driver
+```
+
+Intel 显卡驱动安装完成。
+
+#### NVIDIA 显卡驱动
 
 首先，如果您不知道您的显卡代号或者型号的话，用以下命令检测：
 
@@ -613,7 +681,7 @@ vim /etc/mkinitcpio.conf
 
 在以上表格列出的驱动包中，带有(AUR)后缀的包的安装流程是与其他包不同的，这里分开说明。
 
-#### 安装普通驱动包
+##### 安装普通驱动包
 
 这里我们使用的是 linux-zen 内核，以 nvidia-open-dkms 为例，运行：
 
@@ -623,7 +691,7 @@ pacman -S nvidia-open-dkms nvidia-utils nvidia-settings
 
 驱动包安装完成。如需安装其他驱动包，如 linux 包对应的 nvidia-open ，直接用 nvidia-open 替换上面命令的 nvidia-open-dkms 即可。
 
-#### 安装带有 (AUR) 后缀的驱动包
+##### 安装带有 (AUR) 后缀的驱动包
 
 请确保您现在登录的不是 root 用户，而是您自己创建的非特权账户，以安装 nvidia-580xx-dkms 为例，如需安装其他的 AUR 仓库的驱动包的话，直接用上表给出的包名 -dkms 前的内容替换掉命令中的 nvidia-580xx-utils 中的 nvidia-580xx 即可。
 
@@ -698,7 +766,7 @@ systemctl enable bluetooth.service
 在安装桌面环境之前，为了能让其显示中文，需要安装几款常用字体，运行：
 
 ```bash
-pacman -S noto-fonts noto-fonts-cjk noto-fonts-emoji noto-fonts-extra ttf-jetbrains-mono ttf-dejavu ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono
+pacman -S noto-fonts noto-fonts-cjk noto-fonts-emoji noto-fonts-extra ttf-jetbrains-mono ttf-dejavu ttf-sarasa-gothic ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono
 ```
 
 对于以上安装的包的解释：
@@ -706,6 +774,8 @@ pacman -S noto-fonts noto-fonts-cjk noto-fonts-emoji noto-fonts-extra ttf-jetbra
 - **noto-fonts 、 noto-fonts-cjk 、 noto-fonts-emoji 、 noto-fonts-extra** Google 的 Noto 字体家族，为 Android 操作系统默认字体，其中 noto-fonts-cjk 用于显示中日韩三国文字， noto-fonts-emoji 用于正确显示 emoji ，安装这些包基本可以保证桌面环境能够显示地球上所有在使用的文字。
 
 - **ttf-jetbrains-mono 、 ttf-dejavu** 两款优秀的编程字体，可以优化终端显示。
+
+- **ttf-sarasa-gothic** 一款优秀的等宽中文字体，由思源黑体改造，可提供终端场景下的中文显示。
 
 - **ttf-nerd-fonts-symbols 、 ttf-nerd-fonts-symbols-mono** 用于显示某些终端程序上的图标，比如装了主题的 Zsh 或者 Neovim 。
 
@@ -729,20 +799,19 @@ pacman -S kde-applications
 通常，并不需要安装完整的 KDE 应用包，这个软件包组数量非常庞大，有很多根本没有使用需求的软件。这里给出推荐的安装的 KDE 桌面配套软件，运行：
 
 ```bash
-pacman -S --needed konsole yakuake dolphin ark kate okular partitionmanager filelight gwenview k3b  kcalc kompare ksystemlog
+pacman -S --needed konsole dolphin ark kate okular partitionmanager filelight gwenview k3b  kcalc kompare ksystemlog
 ```
 
 对于以上安装软件包的解释：
 
 - **konsole** KDE 默认的终端。
 
-- **yakuake** 下拉式终端。
-
 - **dolphin** 文件管理器。
 
 - **ark** 压缩文件查看与解压工具。
 
 - **kate** KDE 默认的文本编辑器。
+
 - **okular** PDF 以及其他文档格式的简单查看器。
 
 - **partitionmanager** 图形化的磁盘分区管理工具。
@@ -789,14 +858,14 @@ XMODIFIERS=@im=fcitx
 最后，启用登录管理器：
 
 ```bash
-systemctl enable sddm.service
+systemctl enable plasmalogin.service
 ```
 
 KDE Plasma 桌面环境安装完成。
 
 #### 安装 GNOME 桌面环境
 
-GNOME 是一个追求简单易用的桌面环境。它由 GNOME项目设计，并且完全由自由开源的软件组成。Ubuntu 等发行版使用的就是 GNOME 桌面环境，安装它可以几乎实现从 Ubuntu 无缝迁移。
+GNOME 是一个追求简单易用的桌面环境。它由 GNOME 项目设计，并且完全由自由开源的软件组成。Ubuntu 等发行版使用的就是 GNOME 桌面环境，安装它可以几乎实现从 Ubuntu 无缝迁移。
 
 要安装它，有三个包组可以选择：
 
@@ -925,7 +994,7 @@ passwd root
 需要为主机创建非特权账户，日常使用 root 账户登录是十分危险的操作，应当创建非特权账户进行日常操作，仅在管理系统时使用 root 。要创建非特权账户，运行：
 
 ```bash
-useradd -m -G wheel -s /bin/bash "<用户名>"
+useradd -m -G wheel -s /usr/bin/bash "<用户名>"
 ```
 
 对于命令的解释：
@@ -962,11 +1031,13 @@ visudo
 
 ### 13、安装系统引导
 
-对于系统引导，有多个引导工具可供选择，这里使用 GRUB ，这是目前功能最强大，支持最丰富，也是最稳定的引导管理器。
+对于系统引导，有多个引导工具可供选择，这里给出 GRUB 和 systemd-boot 的安装方法。
 
 ::: info 安全启动
-这里不涉及配置 UEFI 下的安全启动，如需配置安全启动，请移步 Arch Wiki 上的 [GRUB](https://wiki.archlinuxcn.org/wiki/GRUB) 页面。
+这里不涉及配置 UEFI 下的安全启动，如需配置安全启动，请移步 Arch Wiki 上的 [Secure Boot](https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot) 页面。
 :::
+
+#### 使用 GRUB 引导
 
 要使用 GRUB 引导，首先要安装它，运行：
 
@@ -1021,6 +1092,83 @@ grub-mkconfig -o /boot/grub/grub.cfg
 ```
 
 运行完之后，GRUB 引导安装完成。
+
+#### 使用 systemd-boot 引导
+
+在 Arch Linux 上，systemd-boot 通常与 systemd 一起安装，其为 base 元软件包的依赖，因此无需手动安装额外软件包。
+
+::: warning 警告
+要安装 systemd-boot，首先确保启动方式是 UEFI 模式！
+:::
+
+使用 bootctl 将 systemd-boot 安装到 ESP 分区：
+
+```bash
+bootctl install
+```
+
+这将把 systemd-boot UEFI 启动管理器复制到 ESP，同时为其创建一项 UEFI 启动入口，并将其设置为 UEFI 启动顺序的第一项。
+
+下一步要创建启动条目，首先要获取根目录的 UUID：
+
+```bash
+lsblk -no UUID <根目录所在磁盘分区>
+```
+
+使用 vim 编辑器创建并编辑启动条目：
+
+```bash
+vim /boot/loader/entries/archlinux.conf
+```
+
+将以下配置写入文件：
+
+```text
+title Arch Linux
+linux /vmlinuz-linux-zen
+initrd /intel-ucode.img
+initrd /initramfs-linux-zen.img
+options root=UUID=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX rw loglevel=3 nosgx
+```
+
+每个条目的含义如下：
+
+- **title** 在引导管理器中显示的名称。
+
+- **linux** 启动时使用的内核镜像，上面使用的 `vmlinuz-linux-zen` 是占位使用，具体情况要换成自己安装的内核，可以用 `ls -a /boot/vmlinuz-*` 查看具体有哪些内核镜像。
+
+- **initrd** 第一个 initrd 是使用的 CPU 微码镜像，`intel-ucode.img` 只是占位，请务必换成自己使用的微码镜像。
+
+- **initrd** 第二个 initrd 是 init 镜像，上述案例同样的只是占位，具体情况需要替换为自己实际安装的内核，可以用 `ls -a /boot/initramfs-*.img` 查看。
+
+- **options** 填写内核启动参数的一栏，其中 `root=UUID=` 后的 UUID 务必替换为刚才获取到的系统根目录所在分区的 UUID。
+
+之后要配置引导管理器，使用 vim 编辑器编辑 `/boot/loader/loader.conf`：
+
+```bash
+vim /boot/loader/loader.conf
+```
+
+打开后，将文件改为以下内容：
+
+```text
+default archlinux.conf
+editor no
+timeout 3
+console-mode keep
+```
+
+各行的含义如下：
+
+- **default** 默认的启动条目。
+
+- **editor** 是否启用开机时引导管理器的内核参数编辑器，no 表示为不可编辑。
+
+- **timeout** 引导管理器开机时的等待时间，当前为 3 秒，设置为 0 可以不等待，设置为 -1 取消等待。
+
+- **console-mode** 引导管理器显示模式，当前为继承开机时 BIOS 的分辨率。
+
+创建完配置文件后，systemd-boot 安装成功。
 
 ---
 
