@@ -8,6 +8,7 @@ import './vendor/material-you-css/material-you.css'
 import './style.css'
 import './md3.css'
 import NoteIndex from './NoteIndex.vue'
+import Layout from './Layout.vue'
 
 const rippleSelector = [
   '.VPButton',
@@ -105,6 +106,7 @@ function installAppearanceSync() {
 
 export default {
   extends: DefaultTheme,
+  Layout,
   enhanceApp({ app }) {
     app.component('NoteIndex', NoteIndex)
     installRipple()

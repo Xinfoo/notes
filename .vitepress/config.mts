@@ -187,6 +187,12 @@ export default defineConfig({
       }
     ],
 
+    footer: {
+      message:
+        '文档采用 <a href="/license">GFDL 1.3 or later</a> 许可，代码采用 <a href="/license">MIT</a> 许可。',
+      copyright: 'Copyright © 2026 Xinfoo'
+    },
+
     outline: {
       level: [2, 3],
       label: '本页目录'
