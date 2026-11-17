@@ -587,7 +587,7 @@ vim /etc/hosts
 
 ### 6、安装显卡驱动
 
-由于作这篇文章是作者只有这两种显卡硬件，并且没有笔记本，所以只有这两种显卡驱动单独的安装方法，涉及笔记本多显卡或者 AMD 显卡，请参考：
+撰写本文时，作者手头只有 Intel 和 NVIDIA 两种显卡，也没有笔记本电脑，因此这里只给出这两种显卡的驱动安装方法。如果您使用 AMD 显卡、笔记本双显卡（如 NVIDIA Optimus）或其他情况，请参考以下页面：
 
 [NVIDIA](https://wiki.archlinux.org/title/NVIDIA)
 
@@ -599,33 +599,33 @@ vim /etc/hosts
 
 #### Intel 显卡驱动
 
-由于 Intel 提供并支持开源驱动程序，驱动通常已经包含在了 linux-firmware 包中，因此 Intel 显卡基本上是即插即用的，但是只安装 linux-firmware 并不能确保功能完备，特殊情况仍然需要手动配置。
+Intel 提供并支持开源驱动，内核已经包含 i915 / xe 驱动，对应的固件由 linux-firmware 提供，因此 Intel 显卡基本是即插即用的，但是只安装 linux-firmware 并不能确保功能完备，特殊情况仍然需要手动配置。
 
-首先需要确保安装了 mesa，通常情况下，mesa 已经作为 linux-firmware 的依赖安装，在这里建议确认一下：
+Intel 显卡还需要 Mesa 提供 OpenGL 驱动，但此时还没有安装桌面环境，Mesa 通常尚未安装，建议先确认一下：
 
 ```bash
-pacman -Q | grep -i mesa
+pacman -Q mesa
 ```
 
-如果输出中显示 mesa 证明已经安装。
+如果有输出，说明已经安装；如果提示未找到该软件包，说明尚未安装，按下面的说明选择 mesa 或 mesa-amber 安装即可。
 
-有时默认提供的 mesa 包并不在某些旧的硬件下有良好表现，所以 Arch Linux 提供了多个 mesa 包可选。
+有时默认提供的 mesa 包在某些旧的硬件上表现并不好，所以 Arch Linux 提供了多个 mesa 包可选。
 
 - **mesa** 是最新的 Mesa 软件包，其中包括用于 Intel 第 3 代及更高版本硬件的现代 Gallium3D 驱动程序。这是推荐选择。
 
 - **mesa-amber** 是旧版 Mesa 软件包，包括用于第 2 代至第 11 代硬件的经典（非 Gallium3D）驱动程序。此驱动程序对于第 7 代和较旧的硬件具有更好的性能和稳定性，但是不再维护。
 
-如果缺失 mesa 包，或者包的版本不符合情况，使用 `pacman -S <要安装的 mesa 包>` 来安装它。
+如果缺失 mesa 包，或者包的版本不符合您的情况，使用 `pacman -S <要安装的 mesa 包>` 来安装它。
 
-如果安装时什么都不做的话，驱动程序默认不包含 Vulkan 的支持，这时需要安装它：
+默认安装下不会附带 Vulkan 驱动，需要另外安装（Broadwell 及之后的 Intel 显卡支持较好，更早的硬件支持不完整）：
 
 ```bash
 pacman -S vulkan-intel
 ```
 
-在默认安装的情况下，驱动程序也不会对硬件视频编解码支持，这时需要手动配置，有多个包可供选择：
+默认安装同样不提供硬件视频编解码（VA-API）支持，需要手动安装以下软件包之一：
 
-- **intel-media-driver** [Broadwell (~2014)](https://github.com/intel/media-driver/#supported-platforms) 及之后的 HD Graphics 系列（例如英特尔 Arc 系列显卡）使用它。
+- **intel-media-driver** 适用于 [Broadwell (~2014)](https://github.com/intel/media-driver/#supported-platforms) 及之后的核显，以及 Intel Arc 独立显卡。
 
 - **libva-intel-driver** GMA 4500 (2008) 到 [Coffee Lake (2017)](https://en.wikipedia.org/wiki/Coffee_Lake) 的 GPU，请使用它。
 
@@ -1095,7 +1095,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 
 #### 使用 systemd-boot 引导
 
-在 Arch Linux 上，systemd-boot 通常与 systemd 一起安装，其为 base 元软件包的依赖，因此无需手动安装额外软件包。
+在 Arch Linux 上，systemd-boot 随 systemd 软件包一起提供，而 base 元软件包依赖 systemd，因此无需额外安装软件包。
 
 ::: warning 警告
 要安装 systemd-boot，首先确保启动方式是 UEFI 模式！
@@ -1128,7 +1128,7 @@ title Arch Linux
 linux /vmlinuz-linux-zen
 initrd /intel-ucode.img
 initrd /initramfs-linux-zen.img
-options root=UUID=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX rw loglevel=3 nosgx
+options root=UUID=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX rw loglevel=3
 ```
 
 每个条目的含义如下：
@@ -1141,7 +1141,7 @@ options root=UUID=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX rw loglevel=3 nosgx
 
 - **initrd** 第二个 initrd 是 init 镜像，上述案例同样的只是占位，具体情况需要替换为自己实际安装的内核，可以用 `ls -a /boot/initramfs-*.img` 查看。
 
-- **options** 填写内核启动参数的一栏，其中 `root=UUID=` 后的 UUID 务必替换为刚才获取到的系统根目录所在分区的 UUID。
+- **options** 填写内核启动参数的一栏，其中 `root=UUID=` 后的 UUID 务必替换为刚才获取到的系统根目录所在分区的 UUID。如需其他内核参数（例如关闭 Intel SGX 的 `nosgx`），直接追加在这一行的末尾即可。
 
 之后要配置引导管理器，使用 vim 编辑器编辑 `/boot/loader/loader.conf`：
 
@@ -1164,11 +1164,18 @@ console-mode keep
 
 - **editor** 是否启用开机时引导管理器的内核参数编辑器，no 表示为不可编辑。
 
-- **timeout** 引导管理器开机时的等待时间，当前为 3 秒，设置为 0 可以不等待，设置为 -1 取消等待。
+- **timeout** 引导管理器开机时的等待时间，当前为 3 秒。设置为 0 时不显示菜单，直接启动默认条目；设置为负数时则会一直等待，直到手动选择。
 
-- **console-mode** 引导管理器显示模式，当前为继承开机时 BIOS 的分辨率。
+- **console-mode** 引导管理器显示模式，keep 表示保持固件（UEFI）开机时的分辨率。
 
-创建完配置文件后，systemd-boot 安装成功。
+修改完成后，可以运行 bootctl 检查配置能否被正确解析，再用 bootctl list 确认启动条目是否就绪：
+
+```bash
+bootctl
+bootctl list
+```
+
+确认无误后，systemd-boot 安装完成。
 
 ---
 
