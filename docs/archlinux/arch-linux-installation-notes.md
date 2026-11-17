@@ -1243,6 +1243,8 @@ reboot
 
 - [GRUB](https://wiki.archlinux.org/title/GRUB)
 
+- [Systemd-boot](https://wiki.archlinux.org/title/Systemd-boot)
+
 - [KDE](https://wiki.archlinux.org/title/KDE)
 
 - [GNOME](https://wiki.archlinux.org/title/GNOME)
