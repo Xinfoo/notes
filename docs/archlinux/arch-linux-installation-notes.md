@@ -367,7 +367,7 @@ pacstrap -K /mnt base base-devel linux-zen linux-zen-headers linux-firmware sof-
 
 - base-devel 这是基本开发编译工具包，如果之后要使用 AUR ，那这个包是必须的。
 
-- linux-zen、linux-zen-headers 内核和内核头文件，内核是必须的，头文件是编译一些驱动模块需要的包，建议安装。 Arch Linux 提供多种内核，这里使用了 zen 核，这是一个对桌面用户高性能的内核，可根据需要替换为其他内核和对应的头文件，具体请参阅 [Arch Wiki 的内核页面](https://wiki.archlinuxcn.org/wiki/内核) 中的说明。
+- linux-zen、linux-zen-headers 内核和内核头文件，内核是必须的，头文件是编译一些驱动模块需要的包，建议安装。 Arch Linux 提供多种内核，这里使用了 zen 核，这是一个对桌面用户高性能的内核，可根据需要替换为其他内核和对应的头文件，具体请参阅 [Arch Wiki 的内核页面](https://wiki.archlinux.org/title/Kernel) 中的说明。
 
 - linux-firmware 驱动包，里面包含了多个驱动，为了避免您并非全部了解的主机上的其他设备无法工作，这个包必须安装。
 
@@ -504,7 +504,7 @@ KEYMAP=<使用的键盘布局>
 ```
 
 ::: info 提示
-例如，在中国大陆需要将键盘设置为美式键盘，这时写入 `KEYMAP=us` 即可，如果想要查找更多区域的键盘布局请查阅 [Linux 控制台/键盘配置](https://wiki.archlinuxcn.org/wiki/Linux_console/Keyboard_configuration)。
+例如，在中国大陆需要将键盘设置为美式键盘，这时写入 `KEYMAP=us` 即可，如果想要查找更多区域的键盘布局请查阅 [Linux 控制台/键盘配置](https://wiki.archlinux.org/title/Linux_console/Keyboard_configuration)。
 :::
 
 ---
@@ -1219,30 +1219,30 @@ reboot
 
 关于之后要做的事情，我们给出 Arch Wiki上的建议。
 
-[了解 Arch Linux](https://wiki.archlinuxcn.org/wiki/Arch_Linux)
+[了解 Arch Linux](https://wiki.archlinux.org/title/Arch_Linux)
 
-[关于 Arch Linux 和其他发行版的区别](https://wiki.archlinuxcn.org/wiki/Arch_与其他发行版的比较)
+[关于 Arch Linux 和其他发行版的区别](https://wiki.archlinux.org/title/Arch_compared_to_other_distributions)
 
 [如何不弄坏您的 Arch Linux](https://wiki.archlinuxcn.org/wiki/建议阅读/给新用户的关于如何不去弄坏_Arch_Linux_系统的建议)
 
-[建议阅读](https://wiki.archlinuxcn.org/wiki/建议阅读)
+[建议阅读](https://wiki.archlinux.org/title/General_recommendations)
 
 ---
 
 ## 参考资料
 
-- [安装指南](https://wiki.archlinuxcn.org/wiki/安装指南)
+- [安装指南](https://wiki.archlinux.org/title/Installation_guide)
 
-- [Iwd](https://wiki.archlinuxcn.org/wiki/Iwd)
+- [Iwd](https://wiki.archlinux.org/title/Iwd)
 
-- [F2FS](https://wiki.archlinuxcn.org/wiki/F2FS)
+- [F2FS](https://wiki.archlinux.org/title/F2FS)
 
-- [网络配置](https://wiki.archlinuxcn.org/wiki/网络配置)
+- [网络配置](https://wiki.archlinux.org/title/Network_configuration)
 
-- [NVIDIA](https://wiki.archlinuxcn.org/wiki/NVIDIA)
+- [NVIDIA](https://wiki.archlinux.org/title/NVIDIA)
 
-- [GRUB](https://wiki.archlinuxcn.org/wiki/GRUB)
+- [GRUB](https://wiki.archlinux.org/title/GRUB)
 
-- [KDE](https://wiki.archlinuxcn.org/wiki/KDE)
+- [KDE](https://wiki.archlinux.org/title/KDE)
 
-- [GNOME](https://wiki.archlinuxcn.org/wiki/GNOME)
+- [GNOME](https://wiki.archlinux.org/title/GNOME)
