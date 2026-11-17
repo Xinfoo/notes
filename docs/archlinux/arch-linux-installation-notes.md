@@ -373,7 +373,7 @@ pacstrap -K /mnt base base-devel linux-zen linux-zen-headers linux-firmware sof-
 
 - xfsprogs、btrfs-progs、exfatprogs、dosfstools、f2fs-tools、ntfsprogs 这些是几个常用文件系统的管理工具，有了这些您才能在之后处理这些文件系统的分区格式化之类的操作，建议安装。
 
-- sof-firmware 内建音频驱动包，笔记本电脑上通常需要，在台式机上可以移除。
+- sof-firmware 音频 DSP 固件包，主要针对 2019 年及之后出厂的基于 Cadence Tensilica Xtensa 架构的音频 [DSP](https://en.wikipedia.org/wiki/Digital_signal_processor) 的笔记本电脑（少量台式电脑也使用这种架构，比如一些准系统、一体机还有迷你主机），具体可以查看 [Supported Platforms](https://thesofproject.github.io/latest/platforms/)，旧的笔记本和台式电脑通常不需要安装，但是安装完成系统后遇到没有声音的情况，可以补上试一试。
 
 - intel-ucode 这是 CPU 微码包，如果您的主机使用的是 AMD CPU ，请换成 amd-ucode ，如果您是虚拟机，则不需要这个包。
 
@@ -799,7 +799,7 @@ pacman -S kde-applications
 通常，并不需要安装完整的 KDE 应用包，这个软件包组数量非常庞大，有很多根本没有使用需求的软件。这里给出推荐的安装的 KDE 桌面配套软件，运行：
 
 ```bash
-pacman -S --needed konsole dolphin ark kate okular partitionmanager filelight gwenview k3b  kcalc kompare ksystemlog
+pacman -S --needed konsole dolphin ark kate okular partitionmanager filelight gwenview k3b kcalc kompare ksystemlog
 ```
 
 对于以上安装软件包的解释：
