@@ -59,6 +59,8 @@
 │       └── vendor/           # 第三方 CSS 及其许可证
 ├── deploy/
 │   └── nginx-example/        # Nginx 配置模板
+├── LICENSE                   # 代码许可证（MIT）
+├── LICENSE-docs              # 文档许可证（GFDL 1.3）
 └── package.json
 ```
 
@@ -153,10 +155,25 @@ title: 笔记标题
 
 ## 许可证
 
-本项目采用 **MIT License** 发布。正式许可证文本在仓库根目录的 `LICENSE` 文件中。
+本仓库按内容类型分别授权：
 
-第三方资源：
+- **代码与配置**：除 `docs/`、`templates/` 下的 `.md` 文档以及下方列出的第三方资源外，本仓库的代码、配置与说明文档（包括本 README）采用 **MIT License** 发布，许可证文本见仓库根目录的 [`LICENSE`](LICENSE) 文件。
+- **文档**：`docs/` 和 `templates/` 下以 `.md` 结尾的文档采用 **GNU Free Documentation License 1.3 or later** 发布，许可证文本见仓库根目录的 [`LICENSE-docs`](LICENSE-docs) 文件。这些文档不包含 Invariant Sections、Front-Cover Texts 和 Back-Cover Texts。
 
+文档的版权与授权声明如下：
+
+```text
+Copyright (c) 2026 Xinfoo.
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+A copy of the license is included in the file LICENSE-docs.
+```
+
+第三方资源不属于上述两类授权，各自遵循原有许可：
+
+- 项目图标 `docs/public/icon.png` 来自 [The Accessible Icon Project](https://accessibleicon.org/)，由 Sara Hendren、Brian Glenney 和 Tim Ferguson-Sauder 设计，属于公共领域（Public Domain）作品，可自由使用。
 - [material-you-css](https://github.com/hiratazx/material-you-css)：MIT License，位于 `.vitepress/theme/vendor/material-you-css/`，其许可证文件已随代码保留。
 - Noto Sans、Noto Sans SC、JetBrains Mono：SIL Open Font License 1.1。
 - VitePress：MIT License。
